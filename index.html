@@ -1,7 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2008 Financial Crisis</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <div class="container">
+        <div class="section" id="section1">
+            <h1>Welcome to Pie Chart Masters</h1>
+            <p>Scroll down to explore</p>
+        </div>
+        <div class="section" id="section2">
+            <h2>Section 2</h2>
+            <p>Your content here</p>
+        </div>
+        <div class="section" id="section3">
+            <h2>Section 3</h2>
+            <p>Your content here</p>
+        </div>
+        <div class="section" id="section4">
+            <h2>Words cloud on Google Trends</h2>
+            <div class="image-container">
+                <img src="src/Images/word_cloud_example.png" alt="Word Cloud Example" class="section-image">
+            </div>
+            <div class="slider-container">
+                <input type="range" id="dateSlider" class="slider" min="2007" max="2009" step="0.1" value="2008">
+                <div class="slider-labels">
+                    <span>2007</span>
+                    <span id="sliderValue">2008</span>
+                    <span>2009</span>
+                </div>
+                <style src="css/visualizations.css"></style>
+            </div>
+
+            <p>The aim here is to show, with a <strong>word cloud</strong>, the search trends on Google in the United States, in order to highlight the population fear about <strong>2008 financial crisis</strong>.</p>
+            <p>Features : There will be a word cloud of the (for e.g. 100) most search words in the United States. To interact with the word cloud, we'll use a slider to change the date of the data, so the world cloud will change, but we could also place a play button to go through the dates automatically a smoothly</p>
+            <p>Here we'll use : <strong>Google Trends API</strong> to get the data and have a json file (Lecture 4), 
+                <strong>D3.js</strong> to create the word cloud (Lecture 4), 
+                and some <strong>user interactions</strong> (Lecture 5) like a slider to change the date of the data, or the ability to click on a word to see the evolution of the word over time.</p>
+                
+        </div>
+    </div>
+
+    <div class="navigation">
+        <div class="nav-dot active" data-section="0"></div>
+        <div class="nav-dot" data-section="1"></div>
+        <div class="nav-dot" data-section="2"></div>
+        <div class="nav-dot" data-section="3"></div>
+    </div>
+
+    <script src="js/scrollable_container.js"></script>
 </body>
 </html>
