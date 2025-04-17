@@ -12,8 +12,14 @@
             <p>Scroll down to explore</p>
         </div>
         <div class="section" id="section2">
-            <h2>Section 2</h2>
-            <p>Your content here</p>
+            <h2>Map of the mortgage default evolution in the United States</h2>
+            <div class="image-container">
+                <img src="src/Images/USA_map.png" alt="USA map example" class="section-image">
+            </div>
+            <p>The aim here is to show, with a <strong>map</strong>, the evolution of the mortgage default in the United States during the <strong>2008 financial crisis</strong>.</p>
+            <p>Features : There will be a map of the United States, with the evolution of the mortgage default over time. We'll use a slider to change the date of the data, so the map will change, but we could also place a play button to go through the dates smoothly. We will also be able to change the metric of the map, so we can see the evolution of the mortgage default, the unemployment rate, ...</p>
+            <p>Here we'll use : a json file for the data (Lecture 4), <strong>D3.js</strong> to create map (Lecture 4, Lecture 8), 
+                and some <strong>user interactions</strong> (Lecture 5) like a slider to change the date of the data, or the ability to click on a state to see the evolution of the number of mortgage default of this specific state.</p>
         </div>
         <div class="section" id="section3">
             <h2>Section 3</h2>
@@ -22,21 +28,13 @@
         <div class="section" id="section4">
             <h2>Words cloud on Google Trends</h2>
             <div class="image-container">
-                <img src="src/Images/word_cloud_example.png" alt="Word Cloud Example" class="section-image">
-            </div>
-            <div class="slider-container">
-                <input type="range" id="dateSlider" class="slider" min="2007" max="2009" step="0.1" value="2008">
-                <div class="slider-labels">
-                    <span>2007</span>
-                    <span id="sliderValue">2008</span>
-                    <span>2009</span>
-                </div>
-                <style src="css/visualizations.css"></style>
+                <img src="src/Images/word_cloud.png" alt="Word Cloud Example" class="section-image">
             </div>
 
             <p>The aim here is to show, with a <strong>word cloud</strong>, the search trends on Google in the United States, in order to highlight the population fear about <strong>2008 financial crisis</strong>.</p>
-            <p>Features : There will be a word cloud of the (for e.g. 100) most search words in the United States. To interact with the word cloud, we'll use a slider to change the date of the data, so the world cloud will change, but we could also place a play button to go through the dates automatically a smoothly</p>
-            <p>Here we'll use : <strong>Google Trends API</strong> to get the data and have a json file (Lecture 4), 
+            <p>Features : There will be a word cloud of the (for e.g. 100) most searched words in the United States. To interact with the word cloud, we'll use a slider to change the date of the data, so the world cloud will change, but we could also place a play button to go through the dates smoothly.</p>
+            </p>
+            <p>Here we'll use : <strong>Google Trends API</strong> to get the data and save it as a json file (Lecture 4), 
                 <strong>D3.js</strong> to create the word cloud (Lecture 4), 
                 and some <strong>user interactions</strong> (Lecture 5) like a slider to change the date of the data, or the ability to click on a word to see the evolution of the word over time.</p>
                 
