@@ -127,7 +127,7 @@ We also looked at projects from students in previous years, and the project on F
 
 **10% of the final grade**
 
-
+#See https://com-480-data-visualization.github.io/Pie-Chart-Masters/ for the skeleton of the website and the pdf milestone_2_report.pdf for the report 
 ## Milestone 3 (30th May, 5pm)
 
 **80% of the final grade**
