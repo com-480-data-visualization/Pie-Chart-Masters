@@ -132,6 +132,7 @@ html, body {
 /* Individual section backgrounds */
 #section1 {
     background-color: #f8f9fa;
+    justify-content: center;
 }
 
 #section2 {
@@ -249,4 +250,12 @@ html, body {
     .double-section-image {
         max-width: 100%;
     }
+}
+
+#section1 h1 {
+    margin-bottom: 30px;
+}
+
+#section1 p {
+    margin-top: 20px;
 }
