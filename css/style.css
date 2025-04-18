@@ -163,15 +163,17 @@ html, body {
     transition: transform 0.3s ease;
 }
 
-#effectonthefinancialindustry .image-container {
+.double-image-container {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
 }
 
-#effectonthefinancialindustry .section-image {
-    width: 80%;
+.double-section-image {
+    max-width: 50%;
     height: auto;
-    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
 }
