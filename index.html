@@ -9,7 +9,7 @@
     <div class="container">
         <div class="section" id="section1">
             <h1>Welcome to Pie Chart Masters</h1>
-            <p>Scroll down to explore</p>
+            <p>Scroll down to explore our project on the 2008 financial crisis</p>
         </div>
         <div class="section" id="section2">
             <h2>Map of the mortgage default evolution in the United States</h2>
@@ -50,7 +50,7 @@
                 <img src="src/Images/failedbankinusa.png" alt="World_map_bank_collapse" class="double-section-image">
             </div>
             <p>Those two visualization will allow the user to get a broad view of the scale of the financial institutions around the world. The first one is a <strong>dynamic world map</strong> that shows the major financial institutions acquired or bankrupt around the world due to the financial crisis, with the size of the bubbles proportional to the cumulative size of the transactions in this country. After sliding to the right twice, past an analysis of the map, the user will have access to another visualization with a <strong>bar chart</strong> of the USA regional bank collapse number.</p>
-            <p>Features : The user will be able to see either the evolution of the propogation automatically or move in time with a slider. It will also be able to click on the bubble to see details / facts on the transactions in this country. On the bar chart, the user will be able to see the number of failure by hovering its mouse on the bars.</p>
+            <p>Features : The user will be able to see either the evolution of the propogation automatically or move in time with a slider. It will also be able to click on the bubble to see details / facts on the transactions in this country. It will be able to move to the right to the bar chart, and see the number of failure by hovering its mouse on the bars.</p>
             <p>We will use a csv file for the data (Lecture 4) and <strong>D3 and Leaflet</strong> to create a map with interactions like zooming, clicking on the bubbles,etc. (Lecture 5). For the bar chart, we will eventually partition the data to have a more interesting bar charts, maybe with different colors for the size of the bank, if there was an acquirer or no, etc. (Lecture 5) </p>
         </div>
         <div class="section" id="sectionstockmarket">
@@ -59,8 +59,10 @@
                 <img src="src/Images/stockmarket.png" alt="stock_market" class="double-section-image">
                 <img src="src/Images/barchartloss.png" alt="loss" class="double-section-image">
             </div>
-            <p>Here we will use d3 to plot the chart has it can easily handle multiple time series and include interactive functionnalities. (Lecture 4)</p>
-        </div>
+            <p>These two visualizations highlight the global financial impact of the 2008 crisis through the lens of market performance and institutional losses. The first one is a <strong>line chart</strong> showing the normalized stock indices of major economies between 2006 and 2009, revealing the timing and intensity of the global shock. The second one is a <strong>bar chart</strong> showing the total writedowns by financial institutions per country, to better understand where the losses were concentrated.</p>
+            <p>Features : The user will be able to hover over the line chart to compare index values across countries on specific dates. On the bar chart, users will be able to filter or highlight countries to compare levels of exposure. Together, they give a clear picture of both public market reaction and institutional damage.</p>
+            <p>Here we will use <strong>D3</strong> to plot the chart as it can easily handle multiple time series and include interactive functionalities. Data will be loaded from a <strong>CSV</strong> file (Lecture 4), and interactions such as tooltip, highlighting and filters will be implemented using <strong>D3</strong> (Lecture 5).</p>
+            </div>
         <div class="section" id="section4">
             <h2>Words cloud on Google Trends</h2>
             <div class="image-container">
