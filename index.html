@@ -17,9 +17,9 @@
                 <img src="src/Images/USA_map.png" alt="USA map example" class="section-image">
             </div>
             <p>The aim here is to show, with a <strong>map</strong>, the evolution of the mortgage default in the United States during the <strong>2008 financial crisis</strong>.</p>
-            <p>Features : There will be a map of the United States, with the evolution of the mortgage default over time. We'll use a slider to change the date of the data, so the map will change, but we could also place a play button to go through the dates smoothly. We will also be able to change the metric of the map, so we can see the evolution of the mortgage default, the unemployment rate, ...</p>
-            <p>Here we'll use : a json file for the data (Lecture 4), <strong>D3.js</strong> to create map (Lecture 4, Lecture 8), 
-                and some <strong>user interactions</strong> (Lecture 5) like a slider to change the date of the data, or the ability to click on a state to see the evolution of the number of mortgage default of this specific state.</p>
+            <p>Features : There will be a map of the United States, with the evolution of the mortgage default over time represented as a heatmap with a color for each state. We'll use a slider to change the date of the data, so the map will change, but we could also place a play button to go through the dates smoothly. We will also be able to change the metric of the map, so we can see the evolution of the mortgage default, the unemployment rate, ...</p>
+            <p>Here we'll use : a json file for the data (Lecture 4), <strong>D3.js</strong> to create a map (Lecture 4, Lecture 8), 
+                and some <strong>user interactions</strong> (Lecture 5) like a slider to change the date of the data, or the ability to click on a state to see the evolution of the number of mortgage defaults of this specific state.</p>
         </div>
 
 
@@ -30,15 +30,15 @@
                 <img src="src/Images/CHE_unemployment.png" alt="World_map_bank_collapse" class="double-section-image">
             </div>
         
-            <p>The aim here is to show the overall impact of the crisis on the world, it will be shown on different point of view as the unemployment rate, poverty level,debt or GDP.</p>
+            <p>The aim here is to show the overall impact of the crisis on the world, it will be shown via different indicators like the unemployment rate, poverty level, debt or GDP.</p>
 
-            <p>Features: We will display this world map in the first steps. The map will evolve from 1995 to 2019 and can be stopped by the user. Puting the cursor on one of the country will display a time serie with the unemployment level of this country and other indicators as the debt level and GDP for the entire timeframe. We have many indicators that are intersting but we have to do multiple tests to see which one would implement the best with the presentation. </p>
+            <p>Features: We will display a world map to begin with. The map will display indicators in each countries as heatmaps and will span data from 1995 to 2019. Hovering the cursor on one of the country will display a time series with the unemployment level of this country or other indicators like the debt level and GDP, chosen by the user and spanning the entire timeframe. We identified many interesting indicators and still have to perform tests to select the most adapted ones. </p>
 
-            <p>There will be a special interaction with the USA, clicking on the USA will change the map and display an interactive USA map where we could observe the debt level and others indicators per state with a cursor interaction. This part will be combined with the first part we presented above ("Map of the mortgage default evolution in the United States").  </p>
+            <p>There will be a special interaction with the USA, clicking on the USA will change the map and display an interactive USA map where the user will observe the debt level and other indicators per state with a cursor interaction. This part will be combined with the first part we presented above ("Map of the mortgage default evolution in the United States").  </p>
 
-            <p>To achieve that result we will use csv files (Lecture 4) and Leaflet to create an interactive map (Lecture 5). After the interaction, the USA map will be as discribed on "Map of the mortgage default evolution in the United States" (Lecture 4, Lecture 8) but with more features to capture the local socio-economic consequences. </p>
+            <p>To achieve that result we will use csv files (Lecture 4) and Leaflet to create an interactive map (Lecture 5 & 8). After the interaction, the USA map will be as described on "Map of the mortgage default evolution in the United States" but with more indicators to capture the local socio-economic consequences of the crisis. </p>
 
-             <p> Some bonuses that we would like to implement if we can : additional indicators, clustering of countries based on similar trends in unemployment,etc. A specific switzerland insight as we did for the USA map.  </p>
+             <p> Some bonus functionalities that we would like to implement if we can are: additional indicators, clustering of countries based on similar trends in indicators and a specific focus on Switzerland as we did for the USA map.  </p>
         </div>
 
 
@@ -49,9 +49,9 @@
                 <img src="src/Images/frame_085.png" alt="World_map_bank_collapse" class="double-section-image">
                 <img src="src/Images/failedbankinusa.png" alt="World_map_bank_collapse" class="double-section-image">
             </div>
-            <p>Those two visualization will allow the user to get a broad view of the scale of the financial institutions around the world. The first one is a <strong>dynamic world map</strong> that shows the major financial institutions acquired or bankrupt around the world due to the financial crisis, with the size of the bubbles proportional to the cumulative size of the transactions in this country. After sliding to the right twice, past an analysis of the map, the user will have access to another visualization with a <strong>bar chart</strong> of the USA regional bank collapse number.</p>
-            <p>Features : The user will be able to see either the evolution of the propogation automatically or move in time with a slider. It will also be able to click on the bubble to see details / facts on the transactions in this country. It will be able to move to the right to the bar chart, and see the number of failure by hovering its mouse on the bars.</p>
-            <p>We will use a csv file for the data (Lecture 4) and <strong>D3 and Leaflet</strong> to create a map with interactions like zooming, clicking on the bubbles,etc. (Lecture 5 and 8). For the bar chart, we will eventually partition the data to have a more interesting bar charts, maybe with different colors for the size of the bank, if there was an acquirer or no, etc. (Lecture 5) </p>
+            <p>Those two visualizations will allow the user to get a broad view of the scale of the financial institutions collapse around the world. The first one is a <strong>dynamic world map</strong> that shows the major financial institutions acquired or bankrupt around the world due to the financial crisis, with the size of the bubbles proportional to the cumulative size of the transactions in this country. After sliding to the right twice, past a first page with an analysis of the map, the user will have access to another visualization with a <strong>bar chart</strong> of the USA regional bank collapse number.</p>
+            <p>Features : The user will be able to see either the evolution of the propogation automatically or move in time with a slider. It will also be able to click on the bubble to see details / facts on the transactions in this country. It will be able to move to the right to the bar chart, and see the number of failures by hovering its mouse on the bars.</p>
+            <p>We will use a csv file for the data (Lecture 4) and <strong>D3 and Leaflet</strong> to create a map with interactions like zooming, clicking on the bubbles,etc. (Lecture 5 and 8). For the bar chart, we will eventually partition the data to have a more interesting bar chart, maybe with different colors for the size of the bank, if there was an acquirer or not, etc. (Lecture 5) </p>
         </div>
         <div class="section" id="sectionstockmarket">
             <h2>The Stock Market Shock </h2>
@@ -59,9 +59,9 @@
                 <img src="src/Images/stockmarket.png" alt="stock_market" class="double-section-image">
                 <img src="src/Images/barchartloss.png" alt="loss" class="double-section-image">
             </div>
-            <p>These two visualizations highlight the global financial impact of the 2008 crisis through the lens of market performance and institutional losses. The first one is a <strong>line chart</strong> showing the normalized stock indices of major economies between 2006 and 2009, revealing the timing and intensity of the global shock. The second one is a <strong>bar chart</strong> showing the total writedowns by financial institutions per country, to better understand where the losses were concentrated.</p>
+            <p>These two visualizations highlight the global financial impact of the 2008 crisis through the lens of market performance and institutional losses. The first one is a <strong>line chart</strong> showing the normalized stock indexes of major economies between 2006 and 2009, revealing the timing and intensity of the global shock. The second one is a <strong>bar chart</strong> showing the total writedowns by financial institutions per country, to better understand where the losses were concentrated.</p>
             <p>Features : The user will be able to hover over the line chart to compare index values across countries on specific dates. On the bar chart, users will be able to filter or highlight countries to compare levels of exposure. Together, they give a clear picture of both public market reaction and institutional damage.</p>
-            <p>Here we will use <strong>D3</strong> to plot the chart as it can easily handle multiple time series and include interactive functionalities. Data will be loaded from a <strong>CSV</strong> file (Lecture 4), and interactions such as tooltip, highlighting and filters will be implemented using <strong>D3</strong> (Lecture 5).</p>
+            <p>Here we will use <strong>D3</strong> to plot the chart as it can easily handle multiple time series. Data will be loaded from a <strong>CSV</strong> file (Lecture 4), and interactions such as tooltip, highlighting and filters will be implemented using <strong>D3</strong> (Lecture 5).</p>
             </div>
         <div class="section" id="section4">
             <h2>Words cloud on Google Trends</h2>
@@ -69,12 +69,12 @@
                 <img src="src/Images/word_cloud.png" alt="Word Cloud Example" class="section-image">
             </div>
 
-            <p>The aim here is to show, with a <strong>word cloud</strong>, the search trends on Google in the United States, in order to highlight the population fear about <strong>2008 financial crisis</strong>.</p>
-            <p>Features : There will be a word cloud of the (for e.g. 100) most searched words in the United States. To interact with the word cloud, we'll use a slider to change the date of the data, so the world cloud will change, but we could also place a play button to go through the dates smoothly.</p>
+            <p>The aim here is to show, with a <strong>word cloud</strong>, the search trends on Google in the United States, in order to highlight the population's fear about <strong>2008 financial crisis</strong>.</p>
+            <p>Features : There will be a word cloud of the (for e.g. 100) most searched words in the United States. To interact with the word cloud, we'll use a slider to change the date of the data, so the word cloud will change, but we could also place a play button to go through the dates smoothly.</p>
             </p>
             <p>Here we'll use : <strong>Google Trends API</strong> to get the data and save it as a json file (Lecture 4), 
                 <strong>D3.js</strong> to create the word cloud (Lecture 4), 
-                and some <strong>user interactions</strong> (Lecture 5) like a slider to change the date of the data, or the ability to click on a word to see the evolution of the word over time.</p>
+                and some <strong>user interactions</strong> (Lecture 5) such as a slider to change the date of the data, or the ability to click on a word to see the evolution of the word over time.</p>
                 
         </div>
     </div>
