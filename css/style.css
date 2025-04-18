@@ -27,17 +27,29 @@ html, body {
 
 /* Section styles */
 .section {
-    /*Each section is 100% of the viewport height */
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     scroll-snap-align: start;
     text-align: center;
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     position: relative;
     transition: opacity 0.5s ease, transform 0.5s ease;
+    overflow: hidden;
+}
+
+.section-content {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    padding: 20px 0;
 }
 
 .section h1 {
@@ -47,6 +59,7 @@ html, body {
     transform: translateY(20px);
     transition: opacity 0.8s ease, transform 0.8s ease;
     transition-delay: 0.2s;
+    flex-shrink: 0;
 }
 
 .section h2 {
@@ -56,6 +69,7 @@ html, body {
     transform: translateY(20px);
     transition: opacity 0.8s ease, transform 0.8s ease;
     transition-delay: 0.2s;
+    flex-shrink: 0;
 }
 
 .section p {
@@ -65,6 +79,46 @@ html, body {
     transform: translateY(20px);
     transition: opacity 0.8s ease, transform 0.8s ease;
     transition-delay: 0.4s;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Image container styles */
+.image-container {
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.double-image-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.section-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    object-fit: contain;
+}
+
+.double-section-image {
+    max-width: 35%;
+    height: 50%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    object-fit: contain;
 }
 
 /* Animation for active section */
@@ -90,6 +144,14 @@ html, body {
 
 #section4 {
     background-color: #ced4da;
+}
+
+#effectonthefinancialindustry {
+    background-color: #adb5bd;
+}
+
+#sectionstockmarket {
+    background-color: #6c757d;
 }
 
 /* Navigation styles */
@@ -148,32 +210,43 @@ html, body {
     opacity: 1;
 }
 
-.image-container {
-    width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
-    text-align: center;
+/* Media queries for responsive design */
+@media screen and (max-height: 800px) {
+    .section {
+        padding: 10px;
+    }
+    
+    .section-content {
+        padding: 10px 0;
+    }
+    
+    .section h1 {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+    }
+    
+    .section h2 {
+        font-size: 2em;
+        margin-bottom: 15px;
+    }
+    
+    .section p {
+        font-size: 1em;
+        margin-bottom: 10px;
+    }
+    
+    .image-container, .double-image-container {
+        margin: 10px auto;
+    }
 }
 
-.section-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-.double-image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-}
-
-.double-section-image {
-    max-width: 50%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+@media screen and (max-width: 768px) {
+    .double-image-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .double-section-image {
+        max-width: 100%;
+    }
 }
