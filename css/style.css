@@ -10,7 +10,7 @@ html, body {
     width: 100vw;
     overflow: hidden;
     font-family: Arial, sans-serif;
-    background: url('../Image/Blue-background.jpg') no-repeat center center fixed;
+    background: url(https://com-480-data-visualization.github.io/Pie-Chart-Masters/Images/Blue-background.jpg) no-repeat center center fixed;
     background-size: cover;
 }
 
