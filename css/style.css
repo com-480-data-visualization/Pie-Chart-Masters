@@ -10,7 +10,7 @@ html, body {
     width: 100vw;
     overflow: hidden;
     font-family: Arial, sans-serif;
-    background: url(https://com-480-data-visualization.github.io/Pie-Chart-Masters/Images/Blue-background.jpg) no-repeat center center fixed;
+    background: url('./src/Images/Blue-background.jpg') no-repeat center center fixed;
     background-size: cover;
 }
 
@@ -190,20 +190,4 @@ html, body {
 
 .container.scrolling::after {
     opacity: 1;
-}
-
-.us-map-legend {
-    width: 370px !important;
-    height: 58px !important;
-    margin: 0.5em auto 0 auto !important;
-    display: block !important;
-    background: none !important;
-}
-.legend-label {
-    fill: #fff !important;
-    font-size: 15px !important;
-    font-family: inherit;
-}
-.legend-tick {
-    stroke: #fff !important;
 }
