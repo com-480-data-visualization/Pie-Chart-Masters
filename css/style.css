@@ -10,7 +10,7 @@ html, body {
     width: 100vw;
     overflow: hidden;
     font-family: Arial, sans-serif;
-    background: url('../Images/Blue-background.jpg') no-repeat center center fixed;
+    background: url('../Image/Blue-background.jpg') no-repeat center center fixed;
     background-size: cover;
 }
 
