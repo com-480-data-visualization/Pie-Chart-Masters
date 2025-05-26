@@ -1,120 +1,111 @@
 // Initialize the scrollable container
 document.addEventListener('DOMContentLoaded', function() {
-    // Select the importants elements
+    // Select the important elements
     const container = document.querySelector('.container');
-    const sections = document.querySelectorAll('.section');
-    const navDots = document.querySelectorAll('.nav-dot');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navDots = Array.from(document.querySelectorAll('.nav-dot'));
     
-    // Initialize the variables
+    if (!container || sections.length === 0 || navDots.length === 0) {
+        console.error('Required elements not found');
+        return;
+    }
+
+    // Initialize variables
     let currentSection = 0;
     let isScrolling = false;
-    let scrollTimeout;
+    let touchStartY = 0;
     let lastScrollTime = Date.now();
     
     // Function to update active navigation dot and section
-    function updateNavigation() {
-        // Update navigation dots
-        navDots.forEach((dot, index) => {
-            if (index === currentSection) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
+    function updateNavigation(index) {
+        navDots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
         });
         
-        // Update active section for animations
-        sections.forEach((section, index) => {
-            if (index === currentSection) {
-                section.classList.add('active');
-            } else {
-                section.classList.remove('active');
-            }
+        sections.forEach((section, i) => {
+            section.classList.toggle('active', i === index);
         });
     }
     
-    // Function to scroll to a specific section with improved animation
+    // Function to scroll to a specific section
     function scrollToSection(index) {
-        if (isScrolling) return;
+        if (isScrolling || index < 0 || index >= sections.length) return;
         
-        // Update variables
         isScrolling = true;
         currentSection = index;
         
-        // Clear any existing scroll timeout
-        if (scrollTimeout) {
-            clearTimeout(scrollTimeout);
-        }
+        sections[index].scrollIntoView({ behavior: 'smooth' });
+        updateNavigation(index);
         
-        // Add a transition class to the container for smoother scrolling
-        container.classList.add('scrolling');
-        
-        // Scroll to the section with smooth behavior
-        sections[index].scrollIntoView({behavior: 'smooth'});
-        updateNavigation();
-        
-        // Reset scrolling flag after animation completes
-        scrollTimeout = setTimeout(() => {
+        setTimeout(() => {
             isScrolling = false;
-            container.classList.remove('scrolling');
-        }, 800); // Match the CSS transition duration
+        }, 1000);
     }
     
     // Handle navigation dot clicks
     navDots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            scrollToSection(index);
-        });
+        dot.addEventListener('click', () => scrollToSection(index));
     });
     
-    // Handle wheel or trackpad events for scrolling 
-    // (by detecting scroll intent manually instead of nomral browser scrolling)
+    // Handle wheel events
     container.addEventListener('wheel', (e) => {
-        // Disables normal page scrolling to prevent double scrolling
         e.preventDefault();
         
-        // Capture the current time (used for debouncing)
         const now = Date.now();
-
-        // Debounce rapid scrolling
-        // If less than 300ms since last scroll, ignore
-        if (now - lastScrollTime < 300) return;
+        if (now - lastScrollTime < 500) return;
         lastScrollTime = now;
         
-        // if the page is already scrolling, ignore
         if (isScrolling) return;
         
-        // Determine the direction of the scroll
         if (e.deltaY > 0 && currentSection < sections.length - 1) {
-            // Scrolling down
             scrollToSection(currentSection + 1);
         } else if (e.deltaY < 0 && currentSection > 0) {
-            // Scrolling up
             scrollToSection(currentSection - 1);
         }
-    }, {passive: false});
+    }, { passive: false });
+    
+    // Handle touch events for mobile
+    container.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    });
+    
+    container.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        
+        const now = Date.now();
+        if (now - lastScrollTime < 500) return;
+        
+        if (isScrolling) return;
+        
+        const touchEndY = e.touches[0].clientY;
+        const deltaY = touchStartY - touchEndY;
+        
+        if (Math.abs(deltaY) > 50) {
+            lastScrollTime = now;
+            if (deltaY > 0 && currentSection < sections.length - 1) {
+                scrollToSection(currentSection + 1);
+            } else if (deltaY < 0 && currentSection > 0) {
+                scrollToSection(currentSection - 1);
+            }
+        }
+    }, { passive: false });
     
     // Handle keyboard navigation
     document.addEventListener('keydown', (e) => {
-        // if the page is already scrolling, ignore
-        if (isScrolling) return;
-
-        // Capture the current time (used for debouncing)
         const now = Date.now();
-        // Debounce rapid scrolling
-        // If less than 300ms since last scroll, ignore
-        if (now - lastScrollTime < 300) return;
-        lastScrollTime = now;
+        if (now - lastScrollTime < 500) return;
         
-        // Determine the direction of the arrow key press
+        if (isScrolling) return;
+        
         if (e.key === 'ArrowDown' && currentSection < sections.length - 1) {
-            // Scrolling down
+            lastScrollTime = now;
             scrollToSection(currentSection + 1);
         } else if (e.key === 'ArrowUp' && currentSection > 0) {
-            // Scrolling up
+            lastScrollTime = now;
             scrollToSection(currentSection - 1);
         }
     });
     
-    // Initial navigation update
-    updateNavigation();
-}); 
+    // Set initial state
+    updateNavigation(currentSection);
+});

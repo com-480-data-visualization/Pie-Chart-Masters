@@ -7,22 +7,37 @@
 </head>
 <body>
     <div class="container">
-        <div class="section" id="section1">
-            <h1>Welcome to Pie Chart Masters</h1>
-            <p>Scroll down to explore our project on the 2008 financial crisis</p>
+        <div class="section" id="section1" style="position: relative; width: 100vw; height: 100vh; overflow: hidden;">
+            <div id="stochastic-animation" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none;"></div>
+            <div class="welcome-content" style="position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; text-align: center;">
+                <h1 style="font-size: 4vw; font-weight: bold; margin-bottom: 2vh;">What happened in 2008?</h1>
+                <p style="font-size: 2vw;">Scroll down to dive into the data and understand the impact of the financial crisis on the world</p>
+            </div>
         </div>
         <div class="section" id="section2">
-            <h2>Map of the mortgage default evolution in the United States</h2>
-            <div class="image-container">
-                <img src="src/Images/USA_map.png" alt="USA map example" class="section-image">
+            <!-- In section2 of your index.html -->
+            <h2>US Mortgage Delinquency Rate by State (90+ days)</h2>
+            <div class="us-map-container"></div>
+            <div class="controls-container">
+                <div class="slider-play-row">
+                    <button id="map-play-button" class="play-button">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div id="map-slider-container" class="slider-container">
+                        <div class="slider-wrapper">
+                            <input type="range" class="slider">
+                        </div>
+                    </div>
+                    <div class="date-display"></div>
+                </div>
+                
             </div>
-            <p>The aim here is to show, with a <strong>map</strong>, the evolution of the mortgage default in the United States during the <strong>2008 financial crisis</strong>.</p>
-            <p>Features : There will be a map of the United States, with the evolution of the mortgage default over time represented as a heatmap with a color for each state. We'll use a slider to change the date of the data, so the map will change, but we could also place a play button to go through the dates smoothly. We will also be able to change the metric of the map, so we can see the evolution of the mortgage default, the unemployment rate, ...</p>
-            <p>Here we'll use : a json file for the data (Lecture 4), <strong>D3.js</strong> to create a map (Lecture 4, Lecture 8), 
-                and some <strong>user interactions</strong> (Lecture 5) like a slider to change the date of the data, or the ability to click on a state to see the evolution of the number of mortgage defaults of this specific state.</p>
+            <link rel="stylesheet" href="css/us_map.css">
+            <script src="https://d3js.org/d3.v7.min.js"></script>
+            <script src="https://unpkg.com/topojson-client@3"></script>
+            <script src="js/us_map.js"></script>
         </div>
-
-
+        
         <div class="section" id="section3">
             <h2>Unemployment and debt</h2>
             <div class="double-image-container">
@@ -31,18 +46,16 @@
             </div>
         
             <p>The aim here is to show the overall impact of the crisis on the world, it will be shown via different indicators like the unemployment rate, poverty level, debt or GDP.</p>
-
+    
             <p>Features: We will display a world map to begin with. The map will display indicators in each countries as heatmaps and will span data from 1995 to 2019. Hovering the cursor on one of the country will display a time series with the unemployment level of this country or other indicators like the debt level and GDP, chosen by the user and spanning the entire timeframe. We identified many interesting indicators and still have to perform tests to select the most adapted ones. </p>
-
+    
             <p>There will be a special interaction with the USA, clicking on the USA will change the map and display an interactive USA map where the user will observe the debt level and other indicators per state with a cursor interaction. This part will be combined with the first part we presented above ("Map of the mortgage default evolution in the United States").  </p>
-
+    
             <p>To achieve that result we will use csv files (Lecture 4) and Leaflet to create an interactive map (Lecture 5 & 8). After the interaction, the USA map will be as described on "Map of the mortgage default evolution in the United States" but with more indicators to capture the local socio-economic consequences of the crisis. </p>
-
+    
              <p> Some bonus functionalities that we would like to implement if we can are: additional indicators, clustering of countries based on similar trends in indicators and a specific focus on Switzerland as we did for the USA map.  </p>
         </div>
-
-
-
+    
         <div class="section" id="effectonthefinancialindustry">
             <h2>The collapse of the Financial Institutions</h2>
             <div class="double-image-container">
@@ -62,22 +75,48 @@
             <p>These two visualizations highlight the global financial impact of the 2008 crisis through the lens of market performance and institutional losses. The first one is a <strong>line chart</strong> showing the normalized stock indexes of major economies between 2006 and 2009, revealing the timing and intensity of the global shock. The second one is a <strong>bar chart</strong> showing the total writedowns by financial institutions per country, to better understand where the losses were concentrated.</p>
             <p>Features : The user will be able to hover over the line chart to compare index values across countries on specific dates. On the bar chart, users will be able to filter or highlight countries to compare levels of exposure. Together, they give a clear picture of both public market reaction and institutional damage.</p>
             <p>Here we will use <strong>D3</strong> to plot the chart as it can easily handle multiple time series. Data will be loaded from a <strong>CSV</strong> file (Lecture 4), and interactions such as tooltip, highlighting and filters will be implemented using <strong>D3</strong> (Lecture 5).</p>
-            </div>
-        <div class="section" id="section4">
-            <h2>Words cloud on Google Trends</h2>
-            <div class="image-container">
-                <img src="src/Images/word_cloud.png" alt="Word Cloud Example" class="section-image">
-            </div>
-
-            <p>The aim here is to show, with a <strong>word cloud</strong>, the search trends on Google in the United States, in order to highlight the population's fear about <strong>2008 financial crisis</strong>.</p>
-            <p>Features : There will be a word cloud of the (for e.g. 100) most searched words in the United States. To interact with the word cloud, we'll use a slider to change the date of the data, so the word cloud will change, but we could also place a play button to go through the dates smoothly.</p>
-            </p>
-            <p>Here we'll use : <strong>Google Trends API</strong> to get the data and save it as a json file (Lecture 4), 
-                <strong>D3.js</strong> to create the word cloud (Lecture 4), 
-                and some <strong>user interactions</strong> (Lecture 5) such as a slider to change the date of the data, or the ability to click on a word to see the evolution of the word over time.</p>
-                
         </div>
+        <div class="section" id="section_word_cloud">
+            <h2>Public Anxiety: Tracking Fear Through Search Trends</h2>
+            
+            <!-- Container for the word cloud -->
+            <div id="word-cloud-container" class="word-cloud"></div>
+            
+            <!-- Container for the slider and controls -->
+            <div class="controls-container">
+                <div class="legend">
+                    <div style="display: flex; align-items: center; gap: 5px; color: #fff;">
+                        <span style="color: #e41a1c">■</span> Financial Crisis Related
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px; color: #fff;">
+                        <span style="color: #377eb8">■</span> Other Terms
+                    </div>
+                </div>
+                <div class="slider-play-row">
+                    <button id="play-button" class="play-button">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div id="slider-container" class="slider-container">
+                        <div class="slider-wrapper">
+                            <input type="range" class="slider">
+                        </div>
+                    </div>
+                </div>
+                <div class="date-display"></div>
+            </div>
+            
+            <!-- Load Font Awesome -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <!-- Load CSS -->
+            <link rel="stylesheet" href="css/word_cloud.css">
+            
+            <!-- Load D3.js and the word cloud library -->
+            <script src="https://d3js.org/d3.v7.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/d3-cloud@1.2.5/build/d3.layout.cloud.min.js"></script>
+            <script src="js/word_cloud.js"></script>
+        </div> 
     </div>
+    
 
     <div class="navigation">
         <div class="nav-dot active" data-section="0"></div>
@@ -88,6 +127,11 @@
         <div class="nav-dot" data-section="5"></div>
     </div>
 
+    <!-- Load D3.js first -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-cloud@1.2.5/build/d3.layout.cloud.min.js"></script>
     <script src="js/scrollable_container.js"></script>
+    <!-- Load welcome_stochastic.js after D3.js -->
+    <script src="js/welcome_stochastic.js"></script>
 </body>
 </html>
