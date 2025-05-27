@@ -18,19 +18,19 @@
             <!-- In section2 of your index.html -->
             <h2>US Mortgage Delinquency Rate by State (90+ days)</h2>
             <div class="us-map-container"></div>
-            <div class="controls-container">
-                <div class="slider-play-row">
-                    <button id="map-play-button" class="play-button">
+            <div id="us-map-legend-container"></div>
+            <div class="um-controls-container">
+                <div class="um-slider-play-row">
+                    <button id="map-play-button" class="um-play-button">
                         <i class="fas fa-play"></i>
                     </button>
-                    <div id="map-slider-container" class="slider-container">
-                        <div class="slider-wrapper">
-                            <input type="range" class="slider">
+                    <div id="map-slider-container" class="um-slider-container">
+                        <div class="um-slider-wrapper">
+                            <input type="range" class="um-slider">
                         </div>
                     </div>
-                    <div class="date-display"></div>
+                    <div class="um-date-display"></div>
                 </div>
-                
             </div>
             <link rel="stylesheet" href="css/us_map.css">
             <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -83,8 +83,8 @@
             <div id="word-cloud-container" class="word-cloud"></div>
             
             <!-- Container for the slider and controls -->
-            <div class="controls-container">
-                <div class="legend">
+            <div class="wc-controls-container">
+                <div class="wc-legend">
                     <div style="display: flex; align-items: center; gap: 5px; color: #fff;">
                         <span style="color: #e41a1c">■</span> Financial Crisis Related
                     </div>
@@ -92,17 +92,17 @@
                         <span style="color: #377eb8">■</span> Other Terms
                     </div>
                 </div>
-                <div class="slider-play-row">
-                    <button id="play-button" class="play-button">
+                <div class="wc-slider-play-row">
+                    <button id="wc-play-button" class="wc-play-button">
                         <i class="fas fa-play"></i>
                     </button>
-                    <div id="slider-container" class="slider-container">
-                        <div class="slider-wrapper">
-                            <input type="range" class="slider">
+                    <div id="wc-slider-container" class="wc-slider-container">
+                        <div class="wc-slider-wrapper">
+                            <input type="range" class="wc-slider">
                         </div>
                     </div>
                 </div>
-                <div class="date-display"></div>
+                <div class="wc-date-display"></div>
             </div>
             
             <!-- Load Font Awesome -->

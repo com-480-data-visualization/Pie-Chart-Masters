@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
             currentDateIndex = (currentDateIndex + 1) % dates.length;
             const date = dates[currentDateIndex];
             updateMap(date);
-            d3.select('#map-slider-container .slider').property('value', currentDateIndex);
-            d3.select('.date-display').text(formatDate(date));
+            d3.select('#map-slider-container .um-slider').property('value', currentDateIndex);
+            d3.select('.um-date-display').text(formatDate(date));
         }, 1000);
     }
 
@@ -79,15 +79,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Get all available dates
         dates = Object.keys(data[0].values).sort();
+        currentDateIndex = dates.length - 1; // Start with the latest date
 
         // Initialize slider
-        const slider = d3.select('#map-slider-container .slider')
+        const slider = d3.select('#map-slider-container .um-slider')
             .attr('min', 0)
             .attr('max', dates.length - 1)
             .attr('value', currentDateIndex);
 
         // Set initial date display
-        d3.select('.date-display').text(formatDate(dates[currentDateIndex]));
+        d3.select('.um-date-display').text(formatDate(dates[currentDateIndex]));
 
         // Build initial data map
         const dataMap = {};
@@ -128,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 d3.select(this).attr('stroke', '#fff').attr('stroke-width', 1);
             });
 
-
         // Paramètres
         const legendWidth = 350;
         const legendHeight = 18;
@@ -136,8 +136,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const nSegments = colorScale.range().length;
         const segmentWidth = legendWidth / nSegments;
 
+        // Sélectionne le conteneur dédié à la légende
+        const legendContainer = d3.select('#us-map-legend-container');
+        legendContainer.selectAll('*').remove(); // Vide l'ancien contenu si besoin
+
         // Ajoute la nouvelle légende
-        const legendSvg = container.append('svg')
+        const legendSvg = legendContainer.append('svg')
             .attr('class', 'us-map-legend')
             .attr('width', legendWidth + legendMargin.left + legendMargin.right)
             .attr('height', legendHeight + legendMargin.top + legendMargin.bottom);
@@ -171,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentDateIndex = +this.value;
             const date = dates[currentDateIndex];
             updateMap(date);
-            d3.select('.date-display').text(formatDate(date));
+            d3.select('.um-date-display').text(formatDate(date));
         });
 
         // Handle play button

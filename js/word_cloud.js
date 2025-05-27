@@ -153,13 +153,13 @@ function createWordCloud(data, date) {
 
 // Function to create the slider and play controls
 function createSlider(dates, data) {
-    const slider = d3.select('#slider-container .slider')
+    const slider = d3.select('#wc-slider-container .wc-slider')
         .attr('min', 0)
         .attr('max', dates.length - 1)
         .attr('value', 0);
 
     // Add date display
-    const dateDisplay = d3.select('.date-display');
+    const dateDisplay = d3.select('.wc-date-display');
 
     // Format date function
     const formatDate = (dateStr) => {
@@ -175,7 +175,7 @@ function createSlider(dates, data) {
     };
 
     // Get play button element
-    const playButton = d3.select('#play-button');
+    const playButton = d3.select('#wc-play-button');
 
     let isPlaying = false;
     let playInterval;
@@ -242,7 +242,7 @@ window.addEventListener('resize', function() {
         if (!globalData) return; // Don't proceed if data isn't loaded yet
         
         // Get the current date from the slider
-        const slider = d3.select('.slider');
+        const slider = d3.select('.wc-slider');
         const currentIndex = parseInt(slider.property('value'));
         const currentDate = globalData.dates[currentIndex];
         
@@ -264,11 +264,11 @@ document.addEventListener('visibilitychange', function() {
 // Function to show time series for a specific word
 function showWordTimeSeries(word, data) {
     // Create popup if it doesn't exist
-    let popup = d3.select('.popup-overlay');
+    let popup = d3.select('.wc-popup-overlay');
     if (popup.empty()) {
         popup = d3.select('body')
             .append('div')
-            .attr('class', 'popup-overlay')
+            .attr('class', 'wc-popup-overlay')
             .on('click', function(event) {
                 if (event.target === this) {
                     hidePopup();
@@ -276,15 +276,15 @@ function showWordTimeSeries(word, data) {
             });
 
         popup.append('div')
-            .attr('class', 'popup-content')
+            .attr('class', 'wc-popup-content')
             .html(`
-                <button class="popup-close">&times;</button>
-                <h2 class="popup-title"></h2>
-                <div class="popup-chart"></div>
+                <button class="wc-popup-close">&times;</button>
+                <h2 class="wc-popup-title"></h2>
+                <div class="wc-popup-chart"></div>
             `);
 
         // Add close button handler
-        popup.select('.popup-close')
+        popup.select('.wc-popup-close')
             .on('click', hidePopup);
     }
 
@@ -295,7 +295,7 @@ function showWordTimeSeries(word, data) {
         );
 
     // Update popup content
-    popup.select('.popup-title')
+    popup.select('.wc-popup-title')
         .text(`Search Trends for "${word}"`);
 
     // Get the time series data for the word
@@ -305,9 +305,10 @@ function showWordTimeSeries(word, data) {
     }));
 
     // Create the time series chart
-    const chartContainer = popup.select('.popup-chart');
+    const chartContainer = popup.select('.wc-popup-chart');
     chartContainer.selectAll('*').remove();
 
+    // --- Restored SVG-based chart code ---
     const margin = {top: 20, right: 30, bottom: 50, left: 40}; // Increased bottom margin
     let width = chartContainer.node().getBoundingClientRect().width - margin.left - margin.right;
     if (width <= 0 || isNaN(width)) width = 600; // fallback width for popup
@@ -378,6 +379,7 @@ function showWordTimeSeries(word, data) {
         .attr('stroke', lineColor)
         .attr('stroke-width', 2)
         .attr('d', line);
+    // --- End of restored SVG-based chart code ---
 
     // Show the popup
     popup.classed('active', true);
@@ -385,6 +387,6 @@ function showWordTimeSeries(word, data) {
 
 // Function to hide the popup
 function hidePopup() {
-    d3.select('.popup-overlay')
+    d3.select('.wc-popup-overlay')
         .classed('active', false);
 } 
