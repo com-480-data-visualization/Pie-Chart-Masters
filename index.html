@@ -2,10 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2008 Financial Crisis</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Font Awesome for play/pause icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- D3.js and TopoJSON for map visualization -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <!-- Custom styles for unemployment map -->
+    <link rel="stylesheet" href="css/unemployment-map.css">
 </head>
 <body>
     <div class="container">
@@ -55,21 +63,24 @@
         </div>
         
         <div class="section" id="section3">
-            <h2>Unemployment and debt</h2>
-            <div class="double-image-container">
-                <img src="src/Images/map_unemployment_notes.png" alt="world map Unemployment rate" class="double-section-image">
-                <img src="src/Images/CHE_unemployment.png" alt="World_map_bank_collapse" class="double-section-image">
+            <h2>Global Unemployment Impact</h2>
+            <div id="unemployment-map-container">
+                <div id="unemployment-tooltip"></div>
+                <div class="unemployment-legend">
+                    <div class="unemployment-legend-title">Unemployment Rate (%)</div>
+                    <div class="unemployment-legend-scale"></div>
+                    <div class="unemployment-legend-labels">
+                        <span>0%</span>
+                        <span>7.5%</span>
+                        <span>15%+</span>
+                    </div>
+                </div>
+                <div id="unemployment-controls">
+                    <button id="unemployment-play-button"><i class="fas fa-play"></i></button>
+                    <span id="unemployment-year-display">2000</span>
+                    <input type="range" id="unemployment-year-slider" min="2000" max="2023" value="2000">
+                </div>
             </div>
-        
-            <p>The aim here is to show the overall impact of the crisis on the world, it will be shown via different indicators like the unemployment rate, poverty level, debt or GDP.</p>
-    
-            <p>Features: We will display a world map to begin with. The map will display indicators in each countries as heatmaps and will span data from 1995 to 2019. Hovering the cursor on one of the country will display a time series with the unemployment level of this country or other indicators like the debt level and GDP, chosen by the user and spanning the entire timeframe. We identified many interesting indicators and still have to perform tests to select the most adapted ones. </p>
-    
-            <p>There will be a special interaction with the USA, clicking on the USA will change the map and display an interactive USA map where the user will observe the debt level and other indicators per state with a cursor interaction. This part will be combined with the first part we presented above ("Map of the mortgage default evolution in the United States").  </p>
-    
-            <p>To achieve that result we will use csv files (Lecture 4) and Leaflet to create an interactive map (Lecture 5 & 8). After the interaction, the USA map will be as described on "Map of the mortgage default evolution in the United States" but with more indicators to capture the local socio-economic consequences of the crisis. </p>
-    
-             <p> Some bonus functionalities that we would like to implement if we can are: additional indicators, clustering of countries based on similar trends in indicators and a specific focus on Switzerland as we did for the USA map.  </p>
         </div>
     
         <div class="section" id="bank-failures-map">
@@ -155,5 +166,7 @@
     <script src="js/scrollable_container.js"></script>
     <!-- Load welcome_stochastic.js after D3.js -->
     <script src="js/welcome_stochastic.js"></script>
+    <!-- Custom script for unemployment map -->
+    <script src="js/unemployment-map.js"></script>
 </body>
 </html>
