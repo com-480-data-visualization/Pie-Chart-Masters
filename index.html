@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>2008 Financial Crisis</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
     <div class="container">
@@ -56,15 +58,21 @@
              <p> Some bonus functionalities that we would like to implement if we can are: additional indicators, clustering of countries based on similar trends in indicators and a specific focus on Switzerland as we did for the USA map.  </p>
         </div>
     
-        <div class="section" id="effectonthefinancialindustry">
-            <h2>The collapse of the Financial Institutions</h2>
-            <div class="double-image-container">
-                <img src="src/Images/frame_085.png" alt="World_map_bank_collapse" class="double-section-image">
-                <img src="src/Images/failedbankinusa.png" alt="World_map_bank_collapse" class="double-section-image">
+        <div class="section" id="bank-failures-map">
+            <h2>Global Bank Failures Map</h2>
+            <div id="map-container">
+                <div id="bankMap"></div>
+                <input type="range" id="monthSlider" min="0" max="N" step="1">
+                <!-- Overlay UI -->
+                <div id="mapOverlay">
+                    <div id="currentDate">Year: —</div>
+                    <div id="totalAmount">Total: —</div>
+                    <button id="playButton">▶ Play</button>
+                </div>
             </div>
-            <p>Those two visualizations will allow the user to get a broad view of the scale of the financial institutions collapse around the world. The first one is a <strong>dynamic world map</strong> that shows the major financial institutions acquired or bankrupt around the world due to the financial crisis, with the size of the bubbles proportional to the cumulative size of the transactions in this country. After sliding to the right twice, past a first page with an analysis of the map, the user will have access to another visualization with a <strong>bar chart</strong> of the USA regional bank collapse number.</p>
-            <p>Features : The user will be able to see either the evolution of the propogation automatically or move in time with a slider. It will also be able to click on the bubble to see details / facts on the transactions in this country. It will be able to move to the right to the bar chart, and see the number of failures by hovering its mouse on the bars.</p>
-            <p>We will use a csv file for the data (Lecture 4) and <strong>D3 and Leaflet</strong> to create a map with interactions like zooming, clicking on the bubbles,etc. (Lecture 5 and 8). For the bar chart, we will eventually partition the data to have a more interesting bar chart, maybe with different colors for the size of the bank, if there was an acquirer or not, etc. (Lecture 5) </p>
+        </div>
+        <link rel="stylesheet" href="css/bank_map.css">
+        <script src="js/bank_map.js"></script>
         </div>
         <div class="section" id="sectionstockmarket">
             <h2>The Stock Market Shock </h2>
