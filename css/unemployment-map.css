@@ -51,23 +51,28 @@
 
 .timeline-line {
     fill: none;
-    stroke: #4a90e2;
     stroke-width: 2;
 }
 
 .timeline-point {
-    fill: #4a90e2;
     transition: r 0.2s;
-}
-
-.timeline-point.current {
-    fill: #ff4b4b;
-    r: 6;
 }
 
 .timeline-point:hover {
     r: 6;
     cursor: pointer;
+}
+
+.hover-line {
+    stroke: #fff;
+    stroke-width: 1px;
+    stroke-dasharray: 3,3;
+}
+
+.hover-text {
+    font-size: 12px;
+    fill: #fff;
+    text-anchor: middle;
 }
 
 #unemployment-controls {
@@ -130,4 +135,71 @@
     display: flex;
     justify-content: space-between;
     font-size: 12px;
+}
+
+.data-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 20px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.switch-label {
+    color: #fff;
+    font-size: 14px;
 } 

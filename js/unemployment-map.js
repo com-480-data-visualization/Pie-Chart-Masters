@@ -2,14 +2,16 @@
 let width, height;
 let svg, projection, path;
 let unemploymentData = {};
+let gdpData = {};
 let currentYear = 2000;
 let unemploymentIsPlaying = false;
 let unemploymentInterval;
 let hoveredCountry = null;
+let isShowingGDP = false;
 
 // Set initial dimensions for a larger map
-const initialWidth = Math.min(1600, window.innerWidth * 0.98);  // Increased from 1200 to 1600
-const initialHeight = Math.min(800, window.innerHeight * 0.85);  // Increased from 600 to 800
+const initialWidth = Math.min(1600, window.innerWidth * 0.98);
+const initialHeight = Math.min(800, window.innerHeight * 0.85);
 
 // Country name mappings from unemployment data names to map names
 const countryNameMappings = {
@@ -43,6 +45,20 @@ const countryNameMappings = {
     '"Hong Kong SAR, China"': 'Hong Kong'
 };
 
+// Set up timeline dimensions first
+const timelineMargin = { top: 20, right: 25, bottom: 20, left: 35 };
+const timelineWidth = 320;
+const timelineHeight = 150;
+
+// Color scales for unemployment and GDP
+const unemploymentColorScale = d3.scaleSequential()
+    .domain([0, 15])
+    .interpolator(d3.interpolateYlOrRd);
+
+const gdpColorScale = d3.scaleSequential()
+    .domain([-10, 10])
+    .interpolator(d3.interpolateRdYlBu);
+
 // Function to normalize country names
 function normalizeCountryName(name) {
     // First try direct mapping
@@ -61,16 +77,6 @@ function normalizeCountryName(name) {
     return name;
 }
 
-// Set up timeline dimensions first
-const timelineMargin = { top: 20, right: 25, bottom: 20, left: 35 };
-const timelineWidth = 320;
-const timelineHeight = 150;
-
-// Color scale for unemployment rates
-const unemploymentColorScale = d3.scaleSequential()
-    .domain([0, 15])
-    .interpolator(d3.interpolateYlOrRd);
-
 // Initialize the map
 function initMap() {
     const container = document.getElementById('unemployment-map-container');
@@ -85,33 +91,7 @@ function initMap() {
         .style('background', 'transparent');
 
     // Initialize the legend
-    const legendScale = d3.select('.unemployment-legend-scale')
-        .append('svg')
-        .attr('width', 200)
-        .attr('height', 20);
-
-    // Create gradient
-    const gradient = legendScale.append('defs')
-        .append('linearGradient')
-        .attr('id', 'unemployment-gradient')
-        .attr('x1', '0%')
-        .attr('y1', '0%')
-        .attr('x2', '100%')
-        .attr('y2', '0%');
-
-    // Add color stops
-    const colorStops = [0, 0.5, 1];
-    colorStops.forEach(stop => {
-        gradient.append('stop')
-            .attr('offset', `${stop * 100}%`)
-            .attr('stop-color', unemploymentColorScale(stop * 15));
-    });
-
-    // Add gradient rect
-    legendScale.append('rect')
-        .attr('width', 200)
-        .attr('height', 20)
-        .style('fill', 'url(#unemployment-gradient)');
+    updateLegend();
 
     // Adjust projection scale and translation for better fit
     projection = d3.geoMercator()
@@ -121,17 +101,47 @@ function initMap() {
     // Create a path generator
     path = d3.geoPath().projection(projection);
 
-    // Load world map data and unemployment data
+    // Add event listener for the switch
+    document.getElementById('data-type-toggle').addEventListener('change', function(e) {
+        isShowingGDP = e.target.checked;
+        
+        // Update the legend title and labels
+        document.querySelector('.unemployment-legend-title').textContent = 
+            isShowingGDP ? 'GDP Growth Rate (%)' : 'Unemployment Rate (%)';
+        
+        const labels = document.querySelector('.unemployment-legend-labels');
+        if (isShowingGDP) {
+            labels.innerHTML = '<span>-10%</span><span>0%</span><span>+10%</span>';
+        } else {
+            labels.innerHTML = '<span>0%</span><span>7.5%</span><span>15%+</span>';
+        }
+
+        // Update the timeline if it exists and is visible
+        const timelineContainer = d3.select('.timeline-container');
+        if (!timelineContainer.empty() && timelineContainer.style('display') !== 'none') {
+            const countryName = timelineContainer.select('.timeline-title').text().split(' ')[0];
+            const dataset = isShowingGDP ? gdpData : unemploymentData;
+            const countryData = dataset.find(row => 
+                normalizeCountryName(row['Country Name'].replace(/"/g, '')) === countryName
+            );
+            if (countryData) {
+                showTimeline(countryName, countryData, true);
+            }
+        }
+
+        updateLegend();
+        updateMap(currentYear);
+    });
+
+    // Load world map data and both datasets
     Promise.all([
         d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
-        d3.csv('src/data/unemployment/unemployment.csv')
-    ]).then(([worldData, unemploymentCSV]) => {
-        // Process unemployment data
+        d3.csv('src/data/unemployment/unemployment.csv'),
+        d3.csv('src/data/gdp_growth_rate.csv')
+    ]).then(([worldData, unemploymentCSV, gdpCSV]) => {
+        // Process data
         unemploymentData = unemploymentCSV;
-        
-        // Debug: Print all country names from both datasets
-        console.log('Map country names:', topojson.feature(worldData, worldData.objects.countries).features.map(f => f.properties.name));
-        console.log('Unemployment country names:', unemploymentData.map(row => row['Country Name']));
+        gdpData = gdpCSV;
         
         // Draw the map
         const countries = topojson.feature(worldData, worldData.objects.countries);
@@ -142,7 +152,7 @@ function initMap() {
             .append('path')
             .attr('class', 'country')
             .attr('d', path)
-            .style('stroke', '#2a2a3a')  // Darker stroke for better visibility
+            .style('stroke', '#2a2a3a')
             .style('stroke-width', '0.5px')
             .on('mouseover', handleCountryHover)
             .on('mouseout', handleCountryMouseOut)
@@ -151,6 +161,276 @@ function initMap() {
         // Initial update
         updateMap(currentYear);
     });
+}
+
+function updateLegend() {
+    const legendScale = d3.select('.unemployment-legend-scale svg');
+    if (!legendScale.empty()) {
+        legendScale.remove();
+    }
+
+    const newLegendScale = d3.select('.unemployment-legend-scale')
+        .append('svg')
+        .attr('width', 200)
+        .attr('height', 20);
+
+    const gradient = newLegendScale.append('defs')
+        .append('linearGradient')
+        .attr('id', 'data-gradient')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '100%')
+        .attr('y2', '0%');
+
+    const colorScale = isShowingGDP ? gdpColorScale : unemploymentColorScale;
+    const domain = isShowingGDP ? [-10, -5, 0, 5, 10] : [0, 3.75, 7.5, 11.25, 15];
+
+    domain.forEach((value, i) => {
+        gradient.append('stop')
+            .attr('offset', `${(i / (domain.length - 1)) * 100}%`)
+            .attr('stop-color', colorScale(value));
+    });
+
+    newLegendScale.append('rect')
+        .attr('width', 200)
+        .attr('height', 20)
+        .style('fill', 'url(#data-gradient)');
+}
+
+// Update tooltip
+function updateTooltip(event) {
+    if (!hoveredCountry) return;
+
+    const dataset = isShowingGDP ? gdpData : unemploymentData;
+    const countryData = dataset.find(row => 
+        normalizeCountryName(row['Country Name'].replace(/"/g, '')) === hoveredCountry
+    );
+
+    const tooltip = d3.select('#unemployment-tooltip');
+    if (countryData && countryData[currentYear] && !isNaN(countryData[currentYear])) {
+        const value = parseFloat(countryData[currentYear]).toFixed(2);
+        tooltip
+            .style('opacity', 1)
+            .style('left', (event ? event.pageX + 10 : tooltip.node().offsetLeft) + 'px')
+            .style('top', (event ? event.pageY - 28 : tooltip.node().offsetTop) + 'px')
+            .html(`
+                <strong>${hoveredCountry}</strong><br>
+                Year: ${currentYear}<br>
+                ${isShowingGDP ? 'GDP Growth' : 'Unemployment'}: ${value}%
+            `);
+    } else {
+        tooltip
+            .style('opacity', 1)
+            .style('left', (event ? event.pageX + 10 : tooltip.node().offsetLeft) + 'px')
+            .style('top', (event ? event.pageY - 28 : tooltip.node().offsetTop) + 'px')
+            .html(`
+                <strong>${hoveredCountry}</strong><br>
+                Year: ${currentYear}<br>
+                No data available
+            `);
+    }
+}
+
+// Calculate appropriate y-axis domain for a country's data
+function calculateYDomain(data, isGDP) {
+    if (!data) return isGDP ? [-10, 10] : [0, 15];
+
+    const values = Object.keys(data)
+        .filter(key => !isNaN(key) && parseInt(key) >= 2000 && parseInt(key) <= 2023)
+        .map(year => parseFloat(data[year]))
+        .filter(v => !isNaN(v));
+
+    if (values.length === 0) return isGDP ? [-10, 10] : [0, 15];
+
+    if (isGDP) {
+        const minValue = Math.min(...values);
+        const maxValue = Math.max(...values);
+        const padding = Math.abs(maxValue - minValue) * 0.1;
+        
+        return [
+            Math.floor(Math.min(0, minValue - padding)), 
+            Math.ceil(Math.max(0, maxValue + padding))
+        ];
+    } else {
+        return [0, Math.max(15, Math.ceil(d3.max(values)))];
+    }
+}
+
+// Show timeline
+function showTimeline(countryName, data, forceRedraw = false) {
+    // Check if timeline exists for this country
+    const existingTimeline = d3.select('.timeline-container');
+    if (!existingTimeline.empty() && 
+        existingTimeline.style('display') !== 'none' && 
+        existingTimeline.select('.timeline-title').text().split(' ')[0] === countryName &&
+        !forceRedraw) {
+        updateTimelinePoint(existingTimeline);
+        return;
+    }
+
+    // Remove any existing timeline
+    d3.select('.timeline-container').remove();
+
+    // Create timeline container
+    const timelineContainer = d3.select('#unemployment-map-container')
+        .append('div')
+        .attr('class', 'timeline-container')
+        .style('display', 'block');
+
+    // Add title
+    timelineContainer.append('h3')
+        .attr('class', 'timeline-title')
+        .text(`${countryName} ${isShowingGDP ? 'GDP Growth' : 'Unemployment'} Rate`);
+
+    // Create SVG
+    const timelineSvg = timelineContainer.append('svg')
+        .attr('width', timelineWidth + timelineMargin.left + timelineMargin.right)
+        .attr('height', timelineHeight + timelineMargin.top + timelineMargin.bottom);
+
+    const g = timelineSvg.append('g')
+        .attr('transform', `translate(${timelineMargin.left},${timelineMargin.top})`);
+
+    // Filter data to only include years from 2000 onwards
+    const years = Object.keys(data)
+        .filter(key => !isNaN(key) && parseInt(key) >= 2000 && parseInt(key) <= 2023 && data[key] !== '');
+    const values = years.map(year => parseFloat(data[year])).filter(v => !isNaN(v));
+
+    const x = d3.scaleLinear()
+        .domain([2000, 2023])
+        .range([0, timelineWidth]);
+
+    // Calculate y domain based on the data type and values
+    const yDomain = calculateYDomain(data, isShowingGDP);
+    const y = d3.scaleLinear()
+        .domain(yDomain)
+        .range([timelineHeight, 0])
+        .nice();
+
+    // Add axes
+    g.append('g')
+        .attr('transform', `translate(0,${timelineHeight})`)
+        .call(d3.axisBottom(x).tickFormat(d3.format('d')));
+
+    g.append('g')
+        .call(d3.axisLeft(y).ticks(5));
+
+    // Create line generator
+    const line = d3.line()
+        .defined(d => !isNaN(d[1]))
+        .x(d => x(d[0]))
+        .y(d => y(d[1]));
+
+    // Create the line path
+    const timelineData = years.map(year => [parseInt(year), parseFloat(data[year])]);
+
+    // Add the line (always blue)
+    g.append('path')
+        .datum(timelineData)
+        .attr('class', 'timeline-line')
+        .attr('d', line)
+        .style('stroke', '#4a90e2');
+
+    // Add points (all blue except current year in red)
+    g.selectAll('.timeline-point')
+        .data(timelineData)
+        .enter()
+        .append('circle')
+        .attr('class', 'timeline-point')
+        .attr('cx', d => x(d[0]))
+        .attr('cy', d => y(d[1]))
+        .attr('r', d => d[0] === currentYear ? 6 : 4)
+        .style('fill', d => d[0] === currentYear ? '#ff4b4b' : '#4a90e2');
+
+    // Add hover functionality
+    const hoverLine = g.append('line')
+        .attr('class', 'hover-line')
+        .style('display', 'none')
+        .style('stroke', '#fff')
+        .style('stroke-width', '1px')
+        .style('stroke-dasharray', '3,3');
+
+    const hoverText = g.append('text')
+        .attr('class', 'hover-text')
+        .style('display', 'none')
+        .style('fill', '#fff')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px');
+
+    const overlay = g.append('rect')
+        .attr('class', 'overlay')
+        .attr('width', timelineWidth)
+        .attr('height', timelineHeight)
+        .style('fill', 'none')
+        .style('pointer-events', 'all');
+
+    overlay.on('mousemove', function(event) {
+        const [mouseX] = d3.pointer(event);
+        const x0 = x.invert(mouseX);
+        const bisect = d3.bisector(d => d[0]).left;
+        const i = bisect(timelineData, x0);
+        
+        if (i > 0) {
+            const d0 = timelineData[i - 1];
+            const d1 = timelineData[i] || d0;
+            const d = x0 - d0[0] > d1[0] - x0 ? d1 : d0;
+
+            hoverLine
+                .style('display', null)
+                .attr('x1', x(d[0]))
+                .attr('x2', x(d[0]))
+                .attr('y1', 0)
+                .attr('y2', timelineHeight);
+
+            hoverText
+                .style('display', null)
+                .attr('x', x(d[0]))
+                .attr('y', y(d[1]) - 10)
+                .text(`${d[0]}: ${d[1].toFixed(1)}%`);
+        }
+    })
+    .on('mouseout', function() {
+        hoverLine.style('display', 'none');
+        hoverText.style('display', 'none');
+    });
+
+    // Store scales and data in the container for updates
+    timelineContainer.node().__scales = { x, y };
+    timelineContainer.node().__data = timelineData;
+}
+
+// Update timeline point
+function updateTimelinePoint(timelineContainer) {
+    if (!timelineContainer || timelineContainer.empty() || timelineContainer.style('display') === 'none') return;
+
+    const countryName = timelineContainer.select('.timeline-title').text().split(' ')[0];
+    const dataset = isShowingGDP ? gdpData : unemploymentData;
+    const countryData = dataset.find(row => 
+        normalizeCountryName(row['Country Name'].replace(/"/g, '')) === countryName
+    );
+
+    if (!countryData || !countryData[currentYear]) return;
+
+    const { x, y } = timelineContainer.node().__scales;
+    const value = parseFloat(countryData[currentYear]);
+
+    // Update all points to be blue
+    timelineContainer.selectAll('.timeline-point')
+        .style('fill', '#4a90e2')
+        .attr('r', 4);
+
+    // Update or create the point for the current year
+    const currentYearPoints = timelineContainer.selectAll('.timeline-point')
+        .filter(d => d[0] === currentYear);
+
+    if (!currentYearPoints.empty()) {
+        currentYearPoints
+            .style('fill', '#ff4b4b')
+            .attr('r', 6);
+    }
+
+    // Update title to show current value
+    timelineContainer.select('.timeline-title')
+        .text(`${countryName} ${isShowingGDP ? 'GDP Growth' : 'Unemployment'} Rate`);
 }
 
 // Update map colors based on year
@@ -163,46 +443,27 @@ function updateMap(year) {
         .transition()
         .duration(200)
         .style('fill', d => {
-            // Debug Egypt matching
-            if (d.properties.name === 'Egypt') {
-                console.log('Found Egypt in map data:', d.properties.name);
-                console.log('Looking for Egypt in unemployment data...');
-                const egyptData = unemploymentData.find(row => row['Country Name'] === '"Egypt, Arab Rep."');
-                console.log('Egypt unemployment data:', egyptData);
-                if (egyptData) {
-                    console.log('Egypt unemployment value for year', year, ':', egyptData[year]);
-                }
-            }
-
-            // Find the unemployment data entry that matches this map country
-            const countryData = unemploymentData.find(row => {
-                if (d.properties.name === 'Egypt') {
-                    return row['Country Name'].includes('Egypt');
-                }
+            const dataset = isShowingGDP ? gdpData : unemploymentData;
+            const colorScale = isShowingGDP ? gdpColorScale : unemploymentColorScale;
+            
+            const countryData = dataset.find(row => {
                 const mapName = d.properties.name;
-                const unemploymentName = row['Country Name'].replace(/"/g, '');
-                return mapName === normalizeCountryName(unemploymentName);
+                const dataName = row['Country Name'].replace(/"/g, '');
+                return mapName === normalizeCountryName(dataName);
             });
             
             if (!countryData || !countryData[year] || isNaN(countryData[year])) {
-                if (d.properties.name === 'Egypt') {
-                    console.log('No data found for Egypt or data is invalid');
-                }
                 return '#ccc';
             }
             
             const value = parseFloat(countryData[year]);
-            if (d.properties.name === 'Egypt') {
-                console.log('Final unemployment value for Egypt:', value);
-            }
-            return unemploymentColorScale(Math.min(value, 15));
+            return colorScale(isShowingGDP ? Math.max(-10, Math.min(10, value)) : Math.min(value, 15));
         });
 
-    // Update timeline points if timeline is visible
+    // Update timeline if it exists and is visible
     const timelineContainer = d3.select('.timeline-container');
     if (!timelineContainer.empty() && timelineContainer.style('display') !== 'none') {
-        timelineContainer.selectAll('.timeline-point')
-            .classed('current', d => d.year === currentYear);
+        updateTimelinePoint(timelineContainer);
     }
 
     // Update tooltip if a country is being hovered
@@ -213,221 +474,37 @@ function updateMap(year) {
 
 // Handle country hover
 function handleCountryHover(event, d) {
-    hoveredCountry = d;
+    hoveredCountry = d.properties.name;
     updateTooltip(event);
 }
 
-// Update tooltip content and position
-function updateTooltip(event) {
-    if (!hoveredCountry) return;
-
-    // Find the unemployment data entry that matches this map country
-    const countryData = unemploymentData.find(row => {
-        if (hoveredCountry.properties.name === 'Egypt') {
-            return row['Country Name'].includes('Egypt');
-        }
-        const mapName = hoveredCountry.properties.name;
-        const unemploymentName = row['Country Name'].replace(/"/g, '');
-        return mapName === normalizeCountryName(unemploymentName);
-    });
-
-    const tooltip = d3.select('#unemployment-tooltip');
-    
-    let content = hoveredCountry.properties.name;
-    if (countryData && countryData[currentYear] && !isNaN(countryData[currentYear])) {
-        content += `<br>Unemployment Rate (${currentYear}): ${parseFloat(countryData[currentYear]).toFixed(1)}%`;
-    } else {
-        content += '<br>No data available';
-    }
-
-    tooltip.html(content)
-        .style('left', (event ? event.pageX + 10 : parseInt(tooltip.style('left'))) + 'px')
-        .style('top', (event ? event.pageY - 28 : parseInt(tooltip.style('top'))) + 'px')
-        .style('opacity', 1);
-
-    d3.select(event ? event.currentTarget : null)
-        .style('stroke-width', '1')
-        .style('stroke', '#000');
-}
-
-// Handle country mouseout
+// Handle country mouse out
 function handleCountryMouseOut() {
     hoveredCountry = null;
-    d3.select('#unemployment-tooltip')
-        .style('opacity', 0);
-
-    d3.select(this)
-        .style('stroke-width', '0.5')
-        .style('stroke', '#fff');
+    d3.select('#unemployment-tooltip').style('opacity', 0);
 }
 
 // Handle country click
 function handleCountryClick(event, d) {
-    // Find the unemployment data entry that matches this map country
-    const countryData = unemploymentData.find(row => {
-        if (d.properties.name === 'Egypt') {
-            return row['Country Name'].includes('Egypt');
-        }
-        if (d.properties.name === 'United States of America') {
-            return row['Country Name'] === 'United States';
-        }
-        const mapName = d.properties.name;
-        const unemploymentName = row['Country Name'].replace(/"/g, '');
-        return mapName === normalizeCountryName(unemploymentName);
-    });
+    const countryName = d.properties.name;
+    const dataset = isShowingGDP ? gdpData : unemploymentData;
+    const countryData = dataset.find(row => 
+        normalizeCountryName(row['Country Name'].replace(/"/g, '')) === countryName
+    );
 
-    if (!countryData) return;
+    const existingTimeline = d3.select('.timeline-container');
+    const isCurrentCountry = !existingTimeline.empty() && 
+        existingTimeline.style('display') !== 'none' && 
+        existingTimeline.select('.timeline-title').text().split(' ')[0] === countryName;
 
-    const timelineContainer = d3.select('.timeline-container');
-    
-    // If timeline is already shown for this country, hide it
-    if (!timelineContainer.empty() && 
-        timelineContainer.style('display') === 'block' && 
-        timelineContainer.select('.timeline-title').text() === `${d.properties.name} Unemployment Rate`) {
-        timelineContainer.style('display', 'none');
+    if (isCurrentCountry) {
+        existingTimeline.style('display', 'none');
         return;
     }
 
-    // Create timeline data
-    const timelineData = Object.entries(countryData)
-        .filter(([key]) => !isNaN(key) && key >= 2000 && key <= 2023) // Only use years between 2000 and 2023
-        .map(([year, value]) => ({
-            year: parseInt(year),
-            value: parseFloat(value)
-        }))
-        .filter(d => !isNaN(d.value));
-
-    showTimeline(d.properties.name, timelineData);
-}
-
-// Show timeline for country
-function showTimeline(countryName, data) {
-    const timelineContainer = d3.select('.timeline-container');
-    if (timelineContainer.empty()) {
-        // Create timeline container if it doesn't exist
-        d3.select('#unemployment-map-container')
-            .append('div')
-            .attr('class', 'timeline-container')
-            .style('left', '20px')
-            .style('bottom', '20px');
+    if (countryData) {
+        showTimeline(countryName, countryData);
     }
-
-    const margin = {top: 20, right: 20, bottom: 30, left: 40};
-    const width = 360;
-    const height = 200;
-
-    const x = d3.scaleLinear()
-        .domain([2000, 2023]) // Fixed domain for consistent timeline
-        .range([0, width - margin.left - margin.right]);
-
-    const y = d3.scaleLinear()
-        .domain([0, Math.max(15, d3.max(data, d => d.value))]) // Use at least 15 as max for consistency
-        .range([height - margin.top - margin.bottom, 0]);
-
-    const line = d3.line()
-        .defined(d => !isNaN(d.value)) // Skip points with NaN values
-        .x(d => x(d.year))
-        .y(d => y(d.value));
-
-    const timelineDiv = d3.select('.timeline-container')
-        .style('display', 'block')
-        .html('');
-
-    timelineDiv.append('h3')
-        .attr('class', 'timeline-title')
-        .text(`${countryName} Unemployment Rate`);
-
-    const svg = timelineDiv.append('svg')
-        .attr('width', width)
-        .attr('height', height);
-
-    const g = svg.append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
-
-    // Add axes
-    g.append('g')
-        .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
-        .call(d3.axisBottom(x).tickFormat(d3.format('d')));
-
-    g.append('g')
-        .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + '%'));
-
-    // Add line
-    g.append('path')
-        .datum(data)
-        .attr('class', 'timeline-line')
-        .attr('d', line);
-
-    // Create a group for the hover elements
-    const hoverGroup = g.append('g')
-        .style('opacity', '0');
-
-    // Add vertical line for hover
-    const hoverLine = hoverGroup.append('line')
-        .attr('class', 'hover-line')
-        .attr('y1', 0)
-        .attr('y2', height - margin.top - margin.bottom)
-        .style('stroke', '#fff')
-        .style('stroke-width', '1px')
-        .style('stroke-dasharray', '3,3');
-
-    // Add hover circle
-    const hoverCircle = hoverGroup.append('circle')
-        .attr('class', 'hover-circle')
-        .attr('r', 6)
-        .style('fill', '#ff4b4b')
-        .style('stroke', '#fff')
-        .style('stroke-width', '2px');
-
-    // Add hover text
-    const hoverText = hoverGroup.append('text')
-        .attr('class', 'hover-text')
-        .style('fill', '#fff')
-        .style('font-size', '12px')
-        .style('text-anchor', 'middle')
-        .attr('dy', '-10');
-
-    // Add points
-    g.selectAll('.timeline-point')
-        .data(data)
-        .enter()
-        .append('circle')
-        .attr('class', 'timeline-point')
-        .attr('cx', d => x(d.year))
-        .attr('cy', d => y(d.value))
-        .attr('r', 4)
-        .classed('current', d => d.year === currentYear);
-
-    // Create invisible overlay for mouse tracking
-    const bisect = d3.bisector(d => d.year).left;
-
-    g.append('rect')
-        .attr('class', 'overlay')
-        .attr('width', width - margin.left - margin.right)
-        .attr('height', height - margin.top - margin.bottom)
-        .style('fill', 'none')
-        .style('pointer-events', 'all')
-        .on('mouseover', () => hoverGroup.style('opacity', 1))
-        .on('mouseout', () => hoverGroup.style('opacity', 0))
-        .on('mousemove', function(event) {
-            const mouseX = d3.pointer(event, this)[0];
-            const x0 = x.invert(mouseX);
-            const i = bisect(data, x0, 1);
-            const d0 = data[i - 1];
-            const d1 = data[i];
-            if (!d0 || !d1) return;
-            const d = x0 - d0.year > d1.year - x0 ? d1 : d0;
-
-            hoverLine.attr('x1', x(d.year))
-                .attr('x2', x(d.year));
-            
-            hoverCircle.attr('cx', x(d.year))
-                .attr('cy', y(d.value));
-            
-            hoverText.attr('x', x(d.year))
-                .attr('y', y(d.value))
-                .text(`${d.year}: ${d.value.toFixed(1)}%`);
-        });
 }
 
 // Play/pause animation
