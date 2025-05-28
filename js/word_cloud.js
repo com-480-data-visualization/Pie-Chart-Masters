@@ -1,17 +1,6 @@
 // Store data globally
 let globalData = null;
 
-// Define financial crisis related keywords globally
-const financialCrisisKeywords = [
-    'financial crisis', 'recession', 'bankruptcy', 'bailout', 'subprime',
-    'mortgage', 'housing market', 'stock market', 'wall street', 'bank',
-    'credit', 'debt', 'foreclosure', 'unemployment', 'economy',
-    'dow jones', 'bear stearns', 'lehman brothers', 'aig', 'fannie mae',
-    'freddie mac', 'stimulus', 'recovery', 'downturn', 'market crash',
-    'financial meltdown', 'credit crunch', 'housing bubble', 'toxic assets',
-    'banking crisis', 'economic crisis', 'financial markets', 'market turmoil'
-];
-
 // Function to initialize the word cloud
 function initializeWordCloud() {
     // Clear any existing content
@@ -54,38 +43,52 @@ function createWordCloud(data, date) {
     const crisisStartIndex = data.dates.findIndex(d => d.includes('2008-09'));
     const crisisEndIndex = data.dates.findIndex(d => d.includes('2009-06'));
 
-    // Calculate the maximum average value for scaling
-    const maxAverage = Math.max(...Object.values(data.averages));
-    const minAverage = Math.min(...Object.values(data.averages));
-
     // Filter data for the selected date
     const words = Object.entries(data.keywords).map(([keyword, values]) => {
-        const isFinancialCrisis = financialCrisisKeywords.some(crisisWord => 
-            keyword.toLowerCase().includes(crisisWord.toLowerCase())
-        );
+        // Get the crisis-related flag from the data
+        const isCrisisRelated = data.is_crisis_related[keyword] === 1;
         
-        // Calculate size based on average value
-        const avgValue = data.averages[keyword];
-        // Scale the size between 12 and 60 pixels based on the average value
-        let size = 12 + ((avgValue - minAverage) / (maxAverage - minAverage)) * 48;
+        // Get current value and average
+        const currentValue = values[currentDateIndex];
+        const average = data.averages[keyword];
         
-        // If we're in the crisis period and it's a financial crisis term, boost its size
-        if (isFinancialCrisis && currentDateIndex >= crisisStartIndex && currentDateIndex <= crisisEndIndex) {
-            // Get the current value for this keyword
-            const currentValue = values[currentDateIndex];
-            // Calculate how much more important this term is during the crisis
-            const importanceRatio = currentValue / avgValue;
-            // Boost the size based on the importance ratio
-            size *= Math.min(importanceRatio, 2); // Cap the boost at 2x
+        // Calculate ratio of current value to average
+        let ratio = currentValue / average;
+        
+        // Base size calculation
+        const minSize = 12;
+        const maxSize = 60;
+        
+        // Calculate size based on ratio
+        let size;
+        if (ratio > 0) {
+            // Log scale to handle extreme ratios better
+            const logRatio = Math.log(ratio + 1);
+            const maxLogRatio = Math.log(10); // Cap at 10x increase
+            
+            // Scale size based on log ratio
+            size = minSize + (Math.min(logRatio, maxLogRatio) / maxLogRatio) * (maxSize - minSize);
+            
+            // Boost crisis-related words during crisis period
+            if (isCrisisRelated && currentDateIndex >= crisisStartIndex && currentDateIndex <= crisisEndIndex) {
+                // Additional boost for crisis-related words during crisis
+                size *= 1.5;
+                // Cap the maximum size
+                size = Math.min(size, maxSize);
+            }
+        } else {
+            size = minSize;
         }
+        
         return {
             text: keyword,
             size: size,
-            isFinancialCrisis: isFinancialCrisis
+            isCrisisRelated: isCrisisRelated,
+            ratio: ratio
         };
     });
 
-    // Function to draw the words (original version)
+    // Function to draw the words
     function draw(words) {
         // Get or create the SVG
         const svg = d3.select('#word-cloud-container')
@@ -116,43 +119,55 @@ function createWordCloud(data, date) {
         const textEnter = text.enter()
             .append('text')
             .style('font-family', 'Arial')
-            .style('fill', d => d.isFinancialCrisis ? "#e41a1c" : "#377eb8")
+            .style('fill', d => d.isCrisisRelated ? "#e41a1c" : "#377eb8")  // Red for crisis-related, blue for others
             .attr('text-anchor', 'middle')
             .style('opacity', 0)
             .style('cursor', 'pointer')
             .text(d => d.text)
-            .attr('transform', d => `translate(${d.x},${d.y})`);
+            .attr('transform', d => `translate(${d.x},${d.y})`)
+            .on('click', function(event, d) {
+                showWordTimeSeries(d.text, globalData);
+            });
+
+        // Add tooltip to new elements
+        textEnter.append('title')
+            .text(d => `${d.text}\nSearch ratio: ${d.ratio.toFixed(2)}x`);
 
         // UPDATE + ENTER: mots qui restent ou apparaissent
         text.merge(textEnter)
+            .on('click', function(event, d) {
+                showWordTimeSeries(d.text, globalData);
+            })
             .transition()
             .duration(1000)
             .style('font-size', d => `${d.size}px`)
             .style('opacity', 1)
             .attr('transform', d => `translate(${d.x},${d.y})`);
 
-        // Add click handler after the transition
-        text.merge(textEnter)
-            .on('click', function(event, d) {
-                showWordTimeSeries(d.text, globalData);
-            });
+        // Update tooltips for all elements
+        text.selectAll('title')
+            .text(d => `${d.text}\nSearch ratio: ${d.ratio.toFixed(2)}x`);
     }
 
     // Create the word cloud layout
     const layout = d3.layout.cloud()
         .size([width, height])
         .words(words)
-        .padding(0.5)
+        .padding(5)  // Increased padding
         .rotate(() => 0)
         .font("Arial")
         .fontSize(d => d.size)
         .on("end", draw);
 
+    // Debug log before starting layout
+    console.log('Starting layout with words:', words);
+    
     layout.start();
 }
 
 // Function to create the slider and play controls
 function createSlider(dates, data) {
+    // Create slider
     const slider = d3.select('#wc-slider-container .wc-slider')
         .attr('min', 0)
         .attr('max', dates.length - 1)
@@ -163,7 +178,6 @@ function createSlider(dates, data) {
 
     // Format date function
     const formatDate = (dateStr) => {
-        const date = new Date(dateStr);
         const months = {
             '01': 'Jan', '02': 'Fév', '03': 'Mar', '04': 'Avr',
             '05': 'Mai', '06': 'Juin', '07': 'Juil', '08': 'Août',
@@ -289,10 +303,7 @@ function showWordTimeSeries(word, data) {
     }
 
     // Check if the word is related to financial crisis
-    const isFinancialCrisis = data.keywords[word] && 
-        financialCrisisKeywords.some(crisisWord => 
-            word.toLowerCase().includes(crisisWord.toLowerCase())
-        );
+    const isFinancialCrisis = data.is_crisis_related && data.is_crisis_related[word] === 1;
 
     // Update popup content
     popup.select('.wc-popup-title')
