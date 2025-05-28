@@ -50,27 +50,14 @@
         
         <div class="section" id="section3">
             <h2>Global Unemployment Impact</h2>
-            <div id="unemployment-map-container"></div>
-            <div id="unemployment-tooltip" class="tooltip"></div>
-            
-            <div class="unemployment-controls">
-                <button id="unemployment-play-button" class="control-button">
-                    <i class="fas fa-play"></i>
-                </button>
-                <div id="unemployment-year-display">2000</div>
-                <input type="range" id="unemployment-year-slider" min="2000" max="2023" value="2000" step="1">
+            <div id="unemployment-map-container">
+                <div id="unemployment-tooltip"></div>
+                <div id="unemployment-controls">
+                    <button id="unemployment-play-button"><i class="fas fa-play"></i></button>
+                    <span id="unemployment-year-display">2000</span>
+                    <input type="range" id="unemployment-year-slider" min="2000" max="2023" value="2000">
+                </div>
             </div>
-
-            <p>This interactive visualization shows the global impact of economic crises through unemployment rates from 2000 to 2023. The map displays unemployment rates as a heatmap, with darker colors indicating higher unemployment. Click on any country to see its detailed unemployment trend over time.</p>
-            
-            <p>Features:</p>
-            <ul>
-                <li>Interactive world map with color-coded unemployment rates</li>
-                <li>Timeline animation showing changes from 2000 to 2023</li>
-                <li>Country-specific detailed timeline views</li>
-                <li>Play/pause controls for automatic animation</li>
-                <li>Hover tooltips showing specific unemployment rates</li>
-            </ul>
         </div>
     
         <div class="section" id="bank-failures-map">

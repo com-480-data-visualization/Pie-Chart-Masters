@@ -7,6 +7,10 @@ let unemploymentIsPlaying = false;
 let unemploymentInterval;
 let hoveredCountry = null;
 
+// Set initial dimensions for a larger map
+const initialWidth = Math.min(1600, window.innerWidth * 0.98);  // Increased from 1200 to 1600
+const initialHeight = Math.min(800, window.innerHeight * 0.85);  // Increased from 600 to 800
+
 // Country name mappings from unemployment data names to map names
 const countryNameMappings = {
     '"Egypt, Arab Rep."': 'Egypt',
@@ -70,19 +74,20 @@ const unemploymentColorScale = d3.scaleSequential()
 // Initialize the map
 function initMap() {
     const container = document.getElementById('unemployment-map-container');
-    width = container.offsetWidth;
-    height = container.offsetHeight;
+    width = initialWidth;
+    height = initialHeight;
 
-    // Set up the SVG
+    // Set up the SVG with the new dimensions
     svg = d3.select('#unemployment-map-container')
         .append('svg')
         .attr('width', width)
-        .attr('height', height);
+        .attr('height', height)
+        .style('background', 'transparent');
 
-    // Create a projection
+    // Adjust projection scale and translation for better fit
     projection = d3.geoMercator()
-        .scale(width / 2 / Math.PI)
-        .translate([width / 2, height / 2]);
+        .scale((width / 2.3) / Math.PI)  // Adjusted scale factor from 2.5 to 2.3
+        .translate([width / 2, height / 1.8]);  // Adjusted vertical centering from 1.7 to 1.8
 
     // Create a path generator
     path = d3.geoPath().projection(projection);
@@ -108,6 +113,8 @@ function initMap() {
             .append('path')
             .attr('class', 'country')
             .attr('d', path)
+            .style('stroke', '#2a2a3a')  // Darker stroke for better visibility
+            .style('stroke-width', '0.5px')
             .on('mouseover', handleCountryHover)
             .on('mouseout', handleCountryMouseOut)
             .on('click', handleCountryClick);
@@ -370,14 +377,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle window resize
     window.addEventListener('resize', () => {
-        width = document.getElementById('unemployment-map-container').offsetWidth;
-        height = document.getElementById('unemployment-map-container').offsetHeight;
+        width = Math.min(1600, window.innerWidth * 0.98);  // Updated to match new initialWidth
+        height = Math.min(800, window.innerHeight * 0.85);  // Updated to match new initialHeight
         
         svg.attr('width', width)
             .attr('height', height);
 
-        projection.scale(width / 2 / Math.PI)
-            .translate([width / 2, height / 2]);
+        projection
+            .scale((width / 2.3) / Math.PI)  // Updated scale factor
+            .translate([width / 2, height / 1.8]);  // Updated translation
 
         svg.selectAll('.country')
             .attr('d', path);
