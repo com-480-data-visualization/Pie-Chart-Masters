@@ -22,7 +22,7 @@ const countryNameMappings = {
     'Central African Republic': 'Central African Rep.',
     'South Sudan': 'S. Sudan',
     'Lao People\'s Democratic Republic': 'Lao PDR',
-    'Czechia': 'Czech Rep.',
+    'Czech Rep.': 'Czechia',
     'Bosnia and Herzegovina': 'Bosnia and Herz.',
     'Equatorial Guinea': 'Eq. Guinea',
     '"Korea, Rep."': 'South Korea',
@@ -84,10 +84,39 @@ function initMap() {
         .attr('height', height)
         .style('background', 'transparent');
 
+    // Initialize the legend
+    const legendScale = d3.select('.unemployment-legend-scale')
+        .append('svg')
+        .attr('width', 200)
+        .attr('height', 20);
+
+    // Create gradient
+    const gradient = legendScale.append('defs')
+        .append('linearGradient')
+        .attr('id', 'unemployment-gradient')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '100%')
+        .attr('y2', '0%');
+
+    // Add color stops
+    const colorStops = [0, 0.5, 1];
+    colorStops.forEach(stop => {
+        gradient.append('stop')
+            .attr('offset', `${stop * 100}%`)
+            .attr('stop-color', unemploymentColorScale(stop * 15));
+    });
+
+    // Add gradient rect
+    legendScale.append('rect')
+        .attr('width', 200)
+        .attr('height', 20)
+        .style('fill', 'url(#unemployment-gradient)');
+
     // Adjust projection scale and translation for better fit
     projection = d3.geoMercator()
-        .scale((width / 2.3) / Math.PI)  // Adjusted scale factor from 2.5 to 2.3
-        .translate([width / 2, height / 1.8]);  // Adjusted vertical centering from 1.7 to 1.8
+        .scale((width / 2.3) / Math.PI)
+        .translate([width / 2, height / 1.8]);
 
     // Create a path generator
     path = d3.geoPath().projection(projection);
@@ -329,6 +358,35 @@ function showTimeline(countryName, data) {
         .attr('class', 'timeline-line')
         .attr('d', line);
 
+    // Create a group for the hover elements
+    const hoverGroup = g.append('g')
+        .style('opacity', '0');
+
+    // Add vertical line for hover
+    const hoverLine = hoverGroup.append('line')
+        .attr('class', 'hover-line')
+        .attr('y1', 0)
+        .attr('y2', height - margin.top - margin.bottom)
+        .style('stroke', '#fff')
+        .style('stroke-width', '1px')
+        .style('stroke-dasharray', '3,3');
+
+    // Add hover circle
+    const hoverCircle = hoverGroup.append('circle')
+        .attr('class', 'hover-circle')
+        .attr('r', 6)
+        .style('fill', '#ff4b4b')
+        .style('stroke', '#fff')
+        .style('stroke-width', '2px');
+
+    // Add hover text
+    const hoverText = hoverGroup.append('text')
+        .attr('class', 'hover-text')
+        .style('fill', '#fff')
+        .style('font-size', '12px')
+        .style('text-anchor', 'middle')
+        .attr('dy', '-10');
+
     // Add points
     g.selectAll('.timeline-point')
         .data(data)
@@ -339,6 +397,37 @@ function showTimeline(countryName, data) {
         .attr('cy', d => y(d.value))
         .attr('r', 4)
         .classed('current', d => d.year === currentYear);
+
+    // Create invisible overlay for mouse tracking
+    const bisect = d3.bisector(d => d.year).left;
+
+    g.append('rect')
+        .attr('class', 'overlay')
+        .attr('width', width - margin.left - margin.right)
+        .attr('height', height - margin.top - margin.bottom)
+        .style('fill', 'none')
+        .style('pointer-events', 'all')
+        .on('mouseover', () => hoverGroup.style('opacity', 1))
+        .on('mouseout', () => hoverGroup.style('opacity', 0))
+        .on('mousemove', function(event) {
+            const mouseX = d3.pointer(event, this)[0];
+            const x0 = x.invert(mouseX);
+            const i = bisect(data, x0, 1);
+            const d0 = data[i - 1];
+            const d1 = data[i];
+            if (!d0 || !d1) return;
+            const d = x0 - d0.year > d1.year - x0 ? d1 : d0;
+
+            hoverLine.attr('x1', x(d.year))
+                .attr('x2', x(d.year));
+            
+            hoverCircle.attr('cx', x(d.year))
+                .attr('cy', y(d.value));
+            
+            hoverText.attr('x', x(d.year))
+                .attr('y', y(d.value))
+                .text(`${d.year}: ${d.value.toFixed(1)}%`);
+        });
 }
 
 // Play/pause animation

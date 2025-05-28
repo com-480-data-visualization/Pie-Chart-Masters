@@ -101,4 +101,33 @@
 
 #unemployment-year-slider {
     width: 200px;
+}
+
+.unemployment-legend {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 8px;
+    color: white;
+    z-index: 100;
+}
+
+.unemployment-legend-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.unemployment-legend-scale {
+    width: 200px;
+    height: 20px;
+    margin-bottom: 5px;
+}
+
+.unemployment-legend-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
 } 
