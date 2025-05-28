@@ -6,8 +6,6 @@
 }
 
 html, body {
-    height: 100vh;
-    width: 100vw;
     overflow: hidden;
     font-family: Arial, sans-serif;
     background: url('../src/Images/Blue-background.jpg') no-repeat center center fixed;
@@ -16,9 +14,9 @@ html, body {
 
 /* Container styles */
 .container {
-    height: 100%;
-    width: 100%;
-    overflow-y: auto;
+    height: 100vh;
+    width: 100vw;
+    overflow: auto;
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
     position: fixed;
@@ -28,8 +26,10 @@ html, body {
 
 /* Section styles */
 .section {
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vw;
+    max-height: 100vh;
+    box-sizing: border-box;
     scroll-snap-align: start;
     display: flex;
     flex-direction: column;

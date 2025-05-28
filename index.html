@@ -17,21 +17,35 @@
             </div>
         </div>
         <div class="section" id="section2">
-            <!-- In section2 of your index.html -->
-            <h2>US Mortgage Delinquency Rate by State (90+ days)</h2>
-            <div class="us-map-container"></div>
-            <div id="us-map-legend-container"></div>
-            <div class="um-controls-container">
-                <div class="um-slider-play-row">
-                    <button id="map-play-button" class="um-play-button">
-                        <i class="fas fa-play"></i>
-                    </button>
-                    <div id="map-slider-container" class="um-slider-container">
-                        <div class="um-slider-wrapper">
-                            <input type="range" class="um-slider">
+            <div class="mortgage-grid">
+                <h2 class="mortgage-title">US Mortgage Delinquency Rate by State (90+ days)</h2>
+                <div class="mortgage-map-area">
+                    <div id="mortgage-map-container"></div>
+                    <div id="mortgage-map-legend-container"></div>
+                </div>
+                <div class="mortgage-timeseries-area">
+                    <div id="mortgage-timeseries"></div>
+                    <div id="mortgage-dropdowns">
+                        <label for="y1-select" style="color: #fff; margin-right: 10px;">Left Axis:</label>
+                        <select id="y1-select"></select>
+                        <label for="y2-select" style="color: #fff; margin: 0 10px 0 30px;">Right Axis:</label>
+                        <select id="y2-select"></select>
+                    </div>
+                </div>
+                <div class="mortgage-slider-area">
+                    <div id="mortgage-controls-container">
+                        <div id="mortgage-slider-play-row">
+                            <button id="mortgage-play-button">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <div id="mortgage-slider-container">
+                                <div id="mortgage-slider-wrapper">
+                                    <input type="range" id="mortgage-slider">
+                                </div>
+                            </div>
+                            <div id="mortgage-date-display"></div>
                         </div>
                     </div>
-                    <div class="um-date-display"></div>
                 </div>
             </div>
             <link rel="stylesheet" href="css/us_map.css">
@@ -70,9 +84,10 @@
                     <button id="playButton">▶ Play</button>
                 </div>
             </div>
+            <link rel="stylesheet" href="css/bank_map.css">
+            <script src="js/bank_map.js"></script>
         </div>
-        <link rel="stylesheet" href="css/bank_map.css">
-        <script src="js/bank_map.js"></script>
+        
         <div class="section" id="sectionstockmarket">
             <h2>The Stock Market Shock </h2>
             <div class="double-image-container">

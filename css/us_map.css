@@ -1,77 +1,131 @@
-.us-map-container {
-    max-width: 900px; 
-    min-width: 250px;
-    max-height:80vh;
-    margin: 0 0 10vh 0;
-    padding: 0 0 0 0;
+.mortgage-grid {
+    display: grid;
+    grid-template-areas:
+        "title title"
+        "usmap timeseries"
+        "slider slider";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    width: 100%;
+    margin: 0 auto;
+    max-height: 100vh;
+}
+
+.mortgage-grid > h2.mortgage-title {
+    grid-area: title;
+    text-align: center;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    margin-bottom: 50px;
+}
+
+/* ======= US Map ======= */
+
+.mortgage-grid > div.mortgage-map-area {
+    grid-area: usmap;
+    align-items: center;
+}
+
+#mortgage-map-container {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 300px;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.us-map-container svg {
+#mortgage-map-container svg {
     width: 100%;
     height: 100%;
-    max-width: 900px;
+    max-height: 100%;
     display: block;
     margin: 0 auto;
 }
 
-.us-map-legend {
+#mortgage-map-legend-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.3em;
     justify-content: center;
     align-items: center;
     margin: 0 auto 0 auto;
     font-size: clamp(0.8rem, 1.5vw, 1.1rem);
-    max-width: 40vw;
+    width: 100%;
     fill: #ffffff;
 }
 
-.us-map-tooltip {
-    position: absolute;
-    pointer-events: none;
-    background: rgba(255,255,255,0.95);
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    padding: 0.5em 0.8em;
-    font-size: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    display: none;
-    z-index: 10;
-}
+/* ======= Timeseries ======= */
 
-
-.us-map-controls-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 30px;
-    width: 100%;
-    margin: 20px 0 10px 0;
-}
-
-/* ======= Play-Pause Button - Slider - Date ======= */
-
-.um-controls-container {
-    max-width: 50vw;
-    margin: 0.3em auto 0.3em auto;
+.mortgage-grid > div.mortgage-timeseries-area {
+    grid-area: timeseries;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    justify-items: center;
 }
 
-.um-slider-play-row {
+#mortgage-timeseries {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 300px;   /* or 350px, or more if you want */
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0;
+}
+
+#mortgage-dropdowns {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+}
+
+#y1-select, #y2-select {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    min-width: 200px;
+}
+
+#y1-select option, #y2-select option {
+    background: #333;
+    color: #fff;
+}
+
+
+/* ======= Slider : Play-Pause Button - Slider - Date ======= */
+.mortgage-grid > div.mortgage-slider-area {
+    grid-area: slider;
+    grid-column: 1 / span 2;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+#mortgage-controls-container {
+    max-width: 50vw;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+
+#mortgage-slider-play-row {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 30px;
     width: 100%;
-    margin-bottom: 10px;
 }
 
-.um-play-button {
+#mortgage-play-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -87,7 +141,7 @@
     max-width: 30px;
 }
 
-.um-play-button i {
+#mortgage-play-button i {
     font-size: 36px;
     color: #fff;
     line-height: 1;
@@ -96,19 +150,19 @@
     top: 0px;
 }
 
-.um-slider-container {
+#mortgage-slider-container {
     margin-top: 20px;
     margin: 20px auto;
 }
 
-.um-slider-wrapper {
+#mortgage-slider-wrapper {
     width: 30vw;
     min-width: 300px;
     max-width: 100vw;
     overflow: visible;
 }
 
-.um-slider {
+#mortgage-slider {
     width: 100%;
     height: 4px;
     -webkit-appearance: none;
@@ -120,20 +174,74 @@
 }
 
 
-.um-slider::-moz-range-thumb {
+#mortgage-slider::-moz-range-thumb {
     width: 15px;
     height: 15px;
     background: #007bff;
     cursor: pointer;
 }
 
-.um-date-display {
+#mortgage-date-display {
+    display: flex;
+    color: #fff;
+    font-size: 1.3em;
     min-width: 150px;
     text-align: center;
-    color: #ffffff;
-    font-size: 1.3em;
     margin-top: 0;
 }
 
+.mortgage-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+    padding: 0.5em 0.8em;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    display: none;
+    z-index: 10;
+}
 
+/* ======= Pop-up Overlay ======= */
+.mortgage-popup-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10000;
+}
+.mortgage-popup-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    min-width: 350px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: auto;
+    position: relative;
+}
+.mortgage-popup-close {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none; border: none;
+    font-size: 24px; cursor: pointer;
+}
+
+/* ======= Timeseries axes style ======= */
+.x-axis path,
+.x-axis line,
+.y1-axis path,
+.y1-axis line,
+.y2-axis path,
+.y2-axis line {
+  stroke: #fff !important;
+  stroke-width: 1 !important;
+}
+.x-axis text,
+.y1-axis text,
+.y2-axis text {
+  fill: #fff !important;
+}
 
