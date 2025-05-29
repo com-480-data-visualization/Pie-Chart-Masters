@@ -94,12 +94,11 @@
             <h2>Global Bank Failures Map</h2>
             <div id="map-container">
                 <div id="bankMap"></div>
-                <input type="range" id="monthSlider" min="0" max="N" step="1">
-                <!-- Overlay UI -->
-                <div id="mapOverlay">
-                    <div id="currentDate">Year: —</div>
-                    <div id="totalAmount">Total: —</div>
+                <div id="bank-controls">
                     <button id="playButton">▶ Play</button>
+                    <div id="currentDate">—</div>
+                    <div id="totalAmount">—</div>
+                    <input type="range" id="monthSlider" min="0" max="0" step="1">
                 </div>
             </div>
             <link rel="stylesheet" href="css/bank_map.css">

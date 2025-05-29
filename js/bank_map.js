@@ -70,7 +70,7 @@ d3.dsv(";", csvPath).then(data => {
         }
         slider.value = index + 1;
         drawBubbles(monthOptions[slider.value]);
-      }, 400); // 400ms per frame
+      }, 800); // 400ms per frame
     } else {
       clearInterval(playInterval);
       document.getElementById('playButton').innerText = '▶ Play';
@@ -78,80 +78,91 @@ d3.dsv(";", csvPath).then(data => {
   });
 
   // Draw function
-  function drawBubbles(selectedMonthStr) {
-    // Convert to Date
-    const [year, month] = selectedMonthStr.split('-').map(Number);
-    const selectedDate = new Date(year, month - 1);
+function drawBubbles(selectedMonthStr) {
+  // 1) Parse date
+  const [year, month] = selectedMonthStr.split('-').map(Number);
+  const selectedDate = new Date(year, month - 1);
+  document.getElementById('currentDate').innerText =
+    selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-    // Update current date display
-    document.getElementById('currentDate').innerText =
-      selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-    // Clear old bubbles
-    bubbles.forEach(b => map.removeLayer(b));
-    bubbles = [];
-
-    const latestByLocation = {};
-    let total = 0;
-
-    data.forEach(d => {
-      if (d.date <= selectedDate) {
-        const key = `${d.lat},${d.lon}`;
-        if (!latestByLocation[key] || d.date > latestByLocation[key].date) {
-          latestByLocation[key] = d;
-        }
-      }
-    });
-
-    for (const key in latestByLocation) {
-      const d = latestByLocation[key];
-      total += d.cumulative;
-
-      // Default bubble
-      const circle = L.circleMarker([d.lat, d.lon], {
-        radius: scaleRadius(d.cumulative),
-        color: 'red',
-        fillOpacity: 0.6,
-        weight: 1
-      }).bindPopup(`
-        <strong>Location:</strong> [${d.lat.toFixed(2)}, ${d.lon.toFixed(2)}]<br>
-        <strong>Date:</strong> ${d.monthYear}<br>
-        <strong>Cumulative Amount:</strong> $${(d.cumulative / 1e9).toFixed(2)}B
-      `).addTo(map);
-
-      bubbles.push(circle);
-
-      // If United States location, add bar chart popup
-      if (d.lat === 37.09024 && d.lon === -95.712891) {
-        const popupContent = document.createElement('div');
-        popupContent.innerHTML = `
-          <strong>United States</strong><br>
-          <div id="usa-bar-chart" style="width: 300px; height: 200px;"></div>
-        `;
-
-        const specialCircle = L.circleMarker([d.lat, d.lon], {
-          radius: scaleRadius(d.cumulative),
-          color: 'red',
-          fillOpacity: 0.6,
-          weight: 1
-        }).addTo(map);
-
-        specialCircle.bindPopup(popupContent);
-        specialCircle.on('popupopen', () => {
-          drawUSABarChart();
-        });
-
-        bubbles.push(specialCircle);
+  // 2) Compute latestByLocation
+  const latestByLocation = {};
+  data.forEach(d => {
+    if (d.date <= selectedDate) {
+      const key = `${d.lat},${d.lon}`;
+      if (!latestByLocation[key] || d.date > latestByLocation[key].date) {
+        latestByLocation[key] = d;
       }
     }
+  });
 
-    document.getElementById('totalAmount').innerText =
-      `Total: $${(total / 1e9).toFixed(2)}B`;
-  }
+  // 3) Keep reference to old bubbles, then reset array
+  const oldBubbles = bubbles.slice();  // copy
+  bubbles = [];
+
+  // 4) Total for display
+  let total = 0;
+
+  // 5) Create new bubbles (invisible → fade in)
+  Object.values(latestByLocation).forEach(d => {
+    total += d.cumulative;
+    const r = scaleRadius(d.cumulative);
+
+    // Standard bubble
+    const circle = L.circleMarker([d.lat, d.lon], {
+      radius: r,
+      fillColor: 'red',
+      fillOpacity: 0,   // start hidden
+      stroke: false
+    }).addTo(map);
+
+    // fade-in
+    setTimeout(() => circle.setStyle({ fillOpacity: 0.6 }), 20);
+
+    circle.bindPopup(`
+      <strong>Location:</strong> [${d.lat.toFixed(2)}, ${d.lon.toFixed(2)}]<br>
+      <strong>Date:</strong> ${d.monthYear}<br>
+      <strong>Cumulative:</strong> $${(d.cumulative/1e9).toFixed(2)}B
+    `);
+
+    bubbles.push(circle);
+
+    // US special bubble
+    if (d.lat === 37.09024 && d.lon === -95.712891) {
+      const popupContent = document.createElement('div');
+      popupContent.innerHTML = `
+        <strong>Monthly Regional Bank Failures in USA</strong><br>
+        <div id="usa-bar-chart" style="width:300px;height:200px;"></div>
+      `;
+
+      const special = L.circleMarker([d.lat, d.lon], {
+        radius: r,
+        fillColor: 'red',
+        fillOpacity: 0,
+        stroke: false
+      }).addTo(map);
+
+      setTimeout(() => special.setStyle({ fillOpacity: 0.6 }), 20);
+
+      special.bindPopup(popupContent);
+      special.on('popupopen', drawUSABarChart);
+      bubbles.push(special);
+    }
+  });
+
+  // 6) Update total display
+  document.getElementById('totalAmount').innerText =
+    `Total: $${(total/1e9).toFixed(2)}B`;
+
+  // 7) Only after fade‐in completes, remove old bubbles
+  setTimeout(() => {
+    oldBubbles.forEach(b => map.removeLayer(b));
+  }, 300);  // match or exceed your fade duration 
+}
 });
 
 
-// --- Optional Bar Chart in Popup ---
+
 function drawUSABarChart() {
   const container = d3.select("#usa-bar-chart");
   container.selectAll("*").remove();
@@ -200,6 +211,6 @@ function drawUSABarChart() {
       .attr("y", d => y(d.Failed_Bank_Count))
       .attr("width", width / data.length)
       .attr("height", d => height - y(d.Failed_Bank_Count))
-      .attr("fill", "#ff4d4d");
+      .attr("fill", "#161f37");
   });
 }
