@@ -55,11 +55,21 @@ const timelineHeight = 150;
 // Color scales for unemployment and GDP
 const unemploymentColorScale = d3.scaleSequential()
     .domain([0, 15])
-    .interpolator(d3.interpolateYlOrRd);
+    .interpolator(d3.interpolateRgb(
+        d3.color("#4575b4"),  // Blue for low unemployment (colorblind-safe)
+        d3.color("#d73027")   // Red for high unemployment (colorblind-safe)
+    ));
 
-const gdpColorScale = d3.scaleSequential()
-    .domain([-10, 10])
-    .interpolator(d3.interpolateRdYlBu);
+const gdpColorScale = d3.scaleLinear()
+    .domain([-10, -5, 0, 5, 10])  // More color stops for smoother gradient
+    .range([
+        "#e31a1c",  // Bright red for very negative
+        "#fd8d3c",  // Orange for slightly negative
+        "#ffffbf",  // Light yellow for zero
+        "#78c679",  // Light green for slightly positive
+        "#33a02c"   // Bright green for very positive
+    ])
+    .interpolate(d3.interpolateHcl);  // Use HCL interpolation for smoother transitions
 
 // Create SVG for line graph
 const margin = { top: 20, right: 20, bottom: 30, left: 50 };
@@ -153,16 +163,24 @@ function initMap() {
     document.getElementById('data-type-toggle').addEventListener('change', function(e) {
         isShowingGDP = e.target.checked;
         
-        // Update the legend title and labels
-        document.querySelector('.unemployment-legend-title').textContent = 
-            isShowingGDP ? 'GDP Growth Rate (%)' : 'Unemployment Rate (%)';
+        // Update the legend title and labels with transition
+        const legendTitle = document.querySelector('.unemployment-legend-title');
+        legendTitle.style.opacity = 0;
+        setTimeout(() => {
+            legendTitle.textContent = isShowingGDP ? 'GDP Growth Rate (%)' : 'Unemployment Rate (%)';
+            legendTitle.style.opacity = 1;
+        }, 150);
         
         const labels = document.querySelector('.unemployment-legend-labels');
-        if (isShowingGDP) {
-            labels.innerHTML = '<span>-10%</span><span>0%</span><span>+10%</span>';
-        } else {
-            labels.innerHTML = '<span>0%</span><span>7.5%</span><span>15%+</span>';
-        }
+        labels.style.opacity = 0;
+        setTimeout(() => {
+            if (isShowingGDP) {
+                labels.innerHTML = '<span>-10%</span><span>0%</span><span>+10%</span>';
+            } else {
+                labels.innerHTML = '<span>0%</span><span>7.5%</span><span>15%+</span>';
+            }
+            labels.style.opacity = 1;
+        }, 150);
 
         // Update the timeline if it exists and is visible
         const timelineContainer = d3.select('.timeline-container');
@@ -181,8 +199,12 @@ function initMap() {
                 const displayName = timelineContainer.node().__displayName;
                 showTimeline(displayName, countryData);
             } else {
-                // Remove the timeline if no valid data is available
-                timelineContainer.remove();
+                // Remove the timeline with fade out if no valid data is available
+                timelineContainer
+                    .transition()
+                    .duration(300)
+                    .style('opacity', 0)
+                    .on('end', () => timelineContainer.remove());
             }
         }
 
@@ -239,19 +261,42 @@ function updateLegend() {
         .attr('x2', '100%')
         .attr('y2', '0%');
 
-    const colorScale = isShowingGDP ? gdpColorScale : unemploymentColorScale;
-    const domain = isShowingGDP ? [-10, -5, 0, 5, 10] : [0, 3.75, 7.5, 11.25, 15];
+    if (isShowingGDP) {
+        // GDP gradient with more color stops
+        const stops = [
+            { offset: "0%", color: "#e31a1c" },     // Bright red
+            { offset: "25%", color: "#fd8d3c" },    // Orange
+            { offset: "50%", color: "#ffffbf" },    // Light yellow
+            { offset: "75%", color: "#78c679" },    // Light green
+            { offset: "100%", color: "#33a02c" }    // Bright green
+        ];
+        stops.forEach(stop => {
+            gradient.append('stop')
+                .attr('offset', stop.offset)
+                .attr('stop-color', stop.color);
+        });
+    } else {
+        // Unemployment gradient (unchanged)
+        const stops = [
+            { offset: "0%", color: "#4575b4" },    // Blue for low
+            { offset: "100%", color: "#d73027" }   // Red for high
+        ];
+        stops.forEach(stop => {
+            gradient.append('stop')
+                .attr('offset', stop.offset)
+                .attr('stop-color', stop.color);
+        });
+    }
 
-    domain.forEach((value, i) => {
-        gradient.append('stop')
-            .attr('offset', `${(i / (domain.length - 1)) * 100}%`)
-            .attr('stop-color', colorScale(value));
-    });
-
+    // Add the gradient rectangle with transition
     newLegendScale.append('rect')
         .attr('width', 200)
         .attr('height', 20)
-        .style('fill', 'url(#data-gradient)');
+        .style('opacity', 0)
+        .style('fill', 'url(#data-gradient)')
+        .transition()
+        .duration(400)
+        .style('opacity', 1);
 }
 
 // Update tooltip
@@ -320,50 +365,48 @@ function showTimeline(countryName, data) {
     // Remove any existing timeline
     d3.select('.timeline-container').remove();
 
-    // Create timeline container
+    // Create timeline container with black background
     const timelineContainer = d3.select('#unemployment-map-container')
         .append('div')
         .attr('class', 'timeline-container')
         .style('position', 'absolute')
         .style('left', '10px')
         .style('bottom', '10px')
-        .style('background', 'rgba(0, 0, 0, 0.9)')  // Changed to black background
+        .style('background', 'rgba(0, 0, 0, 0.9)')
         .style('padding', '10px')
         .style('border-radius', '5px')
-        .style('border', '1px solid #333')  // Darker border
+        .style('border', '1px solid #333')
         .style('display', 'block');
 
     // Store both the normalized and display names
     const normalizedName = normalizeCountryName(countryName);
     timelineContainer.node().__countryName = normalizedName;
     
-    // Use full name for USA, otherwise use the provided name
     const displayName = normalizedName === 'United States' ? 'United States of America' : countryName;
     timelineContainer.node().__displayName = displayName;
 
-    // Add title with data type
+    // Add title
     timelineContainer.append('div')
         .attr('class', 'timeline-title')
         .style('font-weight', 'bold')
-        .style('color', 'white')  // White text
+        .style('color', 'white')
         .text(`${displayName} ${isShowingGDP ? 'GDP Growth' : 'Unemployment'} Rate: ${parseFloat(data[currentYear]).toFixed(1)}%`);
 
-    // Create SVG with black background
+    // Create SVG
     const svg = timelineContainer.append('svg')
         .attr('width', timelineWidth + timelineMargin.left + timelineMargin.right)
         .attr('height', timelineHeight + timelineMargin.top + timelineMargin.bottom)
-        .style('background', 'black');  // Black background
+        .style('background', 'black');
 
     const g = svg.append('g')
         .attr('transform', `translate(${timelineMargin.left},${timelineMargin.top})`);
 
-    // Filter data to only include years from 2000 onwards
-    const years = Object.keys(data)
+    // Filter and prepare data
+    const timelineData = Object.keys(data)
         .filter(key => !isNaN(key) && parseInt(key) >= 2000 && parseInt(key) <= 2023 && data[key] !== '')
-        .map(year => parseInt(year))
-        .sort((a, b) => a - b);
-
-    const values = years.map(year => parseFloat(data[year])).filter(v => !isNaN(v));
+        .map(year => [parseInt(year), parseFloat(data[year])])
+        .filter(d => !isNaN(d[1]))
+        .sort((a, b) => a[0] - b[0]);
 
     // Create scales
     const x = d3.scaleLinear()
@@ -380,27 +423,17 @@ function showTimeline(countryName, data) {
     g.append('g')
         .attr('transform', `translate(0,${timelineHeight})`)
         .call(d3.axisBottom(x).tickFormat(d3.format('d')))
-        .style('color', 'white')  // White text and lines
+        .style('color', 'white')
         .selectAll('line')
-        .style('stroke', 'white');  // White tick lines
+        .style('stroke', 'white');
 
     g.append('g')
         .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + '%'))
-        .style('color', 'white')  // White text and lines
+        .style('color', 'white')
         .selectAll('line')
-        .style('stroke', 'white');  // White tick lines
+        .style('stroke', 'white');
 
-    // Create line generator
-    const line = d3.line()
-        .defined(d => !isNaN(d[1]))
-        .x(d => x(d[0]))
-        .y(d => y(d[1]))
-        .curve(d3.curveMonotoneX);
-
-    // Create the line path
-    const timelineData = years.map(year => [year, parseFloat(data[year])]);
-
-    // Add grid lines in white
+    // Add grid lines
     g.append('g')
         .attr('class', 'grid')
         .attr('opacity', 0.1)
@@ -408,18 +441,25 @@ function showTimeline(countryName, data) {
             .tickSize(-timelineWidth)
             .tickFormat('')
         )
-        .style('color', 'white');  // White grid lines
+        .style('color', 'white');
 
-    // Add the line with blue color
+    // Create line generator
+    const lineGenerator = d3.line()
+        .defined(d => !isNaN(d[1]))
+        .x(d => x(d[0]))
+        .y(d => y(d[1]))
+        .curve(d3.curveMonotoneX);
+
+    // Add the line
     g.append('path')
         .datum(timelineData)
         .attr('class', 'timeline-line')
         .attr('fill', 'none')
-        .attr('stroke', '#4a90e2')  // Bright blue color
+        .attr('stroke', '#3498db')
         .attr('stroke-width', 2)
-        .attr('d', line);
+        .attr('d', lineGenerator);
 
-    // Add points in blue
+    // Add points
     g.selectAll('.timeline-point')
         .data(timelineData)
         .enter()
@@ -427,55 +467,32 @@ function showTimeline(countryName, data) {
         .attr('class', 'timeline-point')
         .attr('cx', d => x(d[0]))
         .attr('cy', d => y(d[1]))
-        .attr('r', 4)
-        .style('fill', '#4a90e2');  // Blue points
+        .attr('r', 3)
+        .style('fill', '#3498db');
 
-    // Highlight current year point in red
-    g.append('circle')
+    // Add the current year point
+    const currentPoint = g.append('circle')
         .attr('class', 'current-year-point')
-        .attr('cx', x(currentYear))
-        .attr('cy', y(parseFloat(data[currentYear])))
         .attr('r', 6)
-        .style('fill', '#ff4b4b');  // Keep red for current point
+        .style('fill', '#e74c3c');
 
-    // Add hover effects with white tooltip
-    const tooltip = g.append('g')
-        .attr('class', 'timeline-tooltip')
-        .style('display', 'none');
+    // Function to update current point position
+    function updateCurrentPoint(year) {
+        const yearData = timelineData.find(d => d[0] === year);
+        if (yearData) {
+            currentPoint
+                .attr('cx', x(yearData[0]))
+                .attr('cy', y(yearData[1]));
+        }
+    }
 
-    tooltip.append('rect')
-        .attr('class', 'tooltip-bg')
-        .attr('rx', 3)
-        .attr('ry', 3)
-        .attr('fill', 'rgba(255,255,255,0.9)');  // White background for tooltip
-
-    tooltip.append('text')
-        .attr('class', 'tooltip-text')
-        .attr('fill', 'black')  // Black text for better contrast on white background
-        .attr('text-anchor', 'middle')
-        .attr('dy', '-0.5em');
-
-    g.selectAll('.timeline-point, .current-year-point')
-        .on('mouseover', function(event, d) {
-            const [x, y] = d3.pointer(event, g.node());
-            tooltip.style('display', null)
-                .attr('transform', `translate(${x},${y})`);
-            
-            tooltip.select('.tooltip-text')
-                .text(`${d[0]}: ${d[1].toFixed(1)}%`);
-
-            const bbox = tooltip.select('.tooltip-text').node().getBBox();
-            tooltip.select('.tooltip-bg')
-                .attr('x', bbox.x - 5)
-                .attr('y', bbox.y - 2)
-                .attr('width', bbox.width + 10)
-                .attr('height', bbox.height + 4);
-        })
-        .on('mouseout', () => tooltip.style('display', 'none'));
-
-    // Store scales and data for updates
+    // Store the update function for later use
+    timelineContainer.node().__updateCurrentPoint = updateCurrentPoint;
     timelineContainer.node().__scales = { x, y };
     timelineContainer.node().__data = timelineData;
+
+    // Initial position
+    updateCurrentPoint(currentYear);
 }
 
 // Update map colors based on year
@@ -498,39 +515,47 @@ function updateMap(year) {
 
     svg.selectAll('.country')
         .transition()
-        .duration(100) // Reduced transition time
+        .duration(800)  // Longer duration for smoother transition
+        .ease(d3.easeCubicInOut)  // Smooth acceleration and deceleration
         .style('fill', d => {
             const normalizedMapName = normalizeCountryName(d.properties.name);
             const countryData = countryDataMap.get(normalizedMapName);
             
             if (!countryData || !countryData[year] || isNaN(countryData[year])) {
-                return '#ccc';
+                return '#2d3436';  // Darker gray for missing data
             }
             
             const value = parseFloat(countryData[year]);
-            return colorScale(isShowingGDP ? Math.max(-10, Math.min(10, value)) : Math.min(value, 15));
-        });
+            return colorScale(value);
+        })
+        .style('stroke', '#dfe6e9')
+        .style('stroke-width', '0.8px');
 
-    // Update timeline if it exists and is visible
+    // Update timeline if it exists
     const timelineContainer = d3.select('.timeline-container');
     if (!timelineContainer.empty() && timelineContainer.style('display') !== 'none') {
         const storedCountryName = timelineContainer.node().__countryName;
         const countryData = countryDataMap.get(storedCountryName);
 
         if (countryData) {
-            const { x, y } = timelineContainer.node().__scales;
             const value = parseFloat(countryData[year]);
 
             if (!isNaN(value)) {
-                // Update the current year point position
-                timelineContainer.select('.current-year-point')
-                    .attr('cx', x(year))
-                    .attr('cy', y(value));
+                // Update the current year point position with smooth transition
+                const updateCurrentPoint = timelineContainer.node().__updateCurrentPoint;
+                if (updateCurrentPoint) {
+                    updateCurrentPoint(year);
+                }
 
-                // Update title with current value using the stored display name
-                const displayName = timelineContainer.node().__displayName;
+                // Update title with smooth fade transition
                 timelineContainer.select('.timeline-title')
-                    .text(`${displayName} ${isShowingGDP ? 'GDP Growth' : 'Unemployment'} Rate: ${value.toFixed(1)}%`);
+                    .transition()
+                    .duration(400)
+                    .style('opacity', 0)
+                    .transition()
+                    .duration(400)
+                    .text(`${timelineContainer.node().__displayName} ${isShowingGDP ? 'GDP Growth' : 'Unemployment'} Rate: ${value.toFixed(1)}%`)
+                    .style('opacity', 1);
             }
         }
     }
