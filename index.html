@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2008 Financial Crisis</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <!-- Font Awesome for play/pause icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- D3.js and TopoJSON for map visualization -->
@@ -89,22 +87,29 @@
                 </div>
             </div>
         </div>
-    
+        
         <div class="section" id="bank-failures-map">
             <h2>Global Bank Failures Map</h2>
-            <div id="map-container">
-                <div id="bankMap"></div>
-                <input type="range" id="monthSlider" min="0" max="N" step="1">
-                <!-- Overlay UI -->
-                <div id="mapOverlay">
-                    <div id="currentDate">Year: —</div>
-                    <div id="totalAmount">Total: —</div>
-                    <button id="playButton">▶ Play</button>
-                </div>
-            </div>
-            <link rel="stylesheet" href="css/bank_map.css">
-            <script src="js/bank_map.js"></script>
+        <div id="map-container">
+          <div id="bankMap"></div>
+
+          <!-- Combined controls container -->
+          <div id="bank-controls">
+            <button id="playButton">▶ Play</button>
+            <div id="currentDate">—</div>
+            <div id="totalAmount">—</div>
+            <input
+              type="range"
+              id="monthSlider"
+              min="0"
+              max="0"
+              step="1"
+            />
+          </div>
         </div>
+          <link rel="stylesheet" href="css/bank_map.css">
+          <script src="js/bank_map.js"></script>
+        </div>    
         
         <div class="section" id="sectionstockmarket">
             <h2>The Stock Market Shock </h2>

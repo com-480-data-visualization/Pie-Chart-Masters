@@ -1,207 +1,214 @@
-const csvPath = 'src/data/bank_map/file_modified.csv';
+// bank_map_static.js
 
-let isPlaying = false;
-let playInterval = null;
+// --- CONFIGURATION & GLOBALS ---
+const dataPath       = 'src/data/bank_map/file_modified.csv';
+const usaMonthlyPath = 'src/data/bank_map/monthly_failed_banks.csv';
+const topoJSONPath   = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
-let map = L.map('bankMap').setView([20, 0], 2); // Centered world view
+const margin = { top: 0, right: 0, bottom: 0, left: 0 };
+let width   = 960, height = 500;
 
-// Base map tiles
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; CartoDB'
-}).addTo(map);
+let svg, projection, path;
+let allData = [], months = [];
+let playInterval = null, isPlaying = false;
 
-let bubbles = [];
-let monthOptions = []; // to hold YYYY-MM options
+// d3 scale for bubble radius
+const scaleRadius = d3.scaleSqrt()
+  .domain([0, d3.max([1])])
+  .range([0, 40]);  // will update domain once data loads
 
-// Utility: scale bubble size based on amount
-function scaleRadius(amount) {
-  return Math.sqrt(amount) / 10000;
+// --- SETUP SVG & PROJECTION ---
+function initSVG() {
+  // responsive sizing
+  const container = document.getElementById('bankMap');
+  width  = container.clientWidth;
+  height = container.clientHeight;
+
+  svg = d3.select('#bankMap')
+    .append('svg')
+    .attr('width',  width)
+    .attr('height', height);
+
+  projection = d3.geoMercator()
+    .scale((width / 2) / Math.PI)
+    .translate([width / 2, height / 1.6]);
+
+  path = d3.geoPath().projection(projection);
 }
 
-// Load CSV using D3
-d3.dsv(";", csvPath).then(data => {
-  // Parse and clean
+// --- LOAD & DRAW BASE MAP ---
+function drawBaseMap(world) {
+  const countries = topojson.feature(world, world.objects.countries).features;
+
+  svg.append('g')
+    .selectAll('path')
+    .data(countries)
+    .enter().append('path')
+      .attr('d', path)
+      .attr('fill', '#ccc')
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 0.5);
+}
+
+// --- DATA LOADING & INITIALIZATION ---
+Promise.all([
+  d3.json(topoJSONPath),
+  d3.dsv(';', dataPath)
+]).then(([world, data]) => {
+  initSVG();
+  drawBaseMap(world);
+
+  // parse & prepare
   data.forEach(d => {
-    d.date = new Date(d.date);
-    d.year = d.date.getFullYear();
-    d.month = d.date.getMonth() + 1;
-    d.lat = +d.lat;
-    d.lon = +d.lon;
-    d.amount = +d.amount;
+    d.date       = new Date(d.date);
+    d.year       = d.date.getFullYear();
+    d.month      = d.date.getMonth() + 1;
+    d.monthStr   = `${d.year}-${String(d.month).padStart(2,'0')}`;
+    d.lat        = +d.lat;
+    d.lon        = +d.lon;
     d.cumulative = +d.cumulative_amount_by_location;
-
-    // Format: YYYY-MM
-    const monthStr = `${d.year}-${String(d.month).padStart(2, '0')}`;
-    d.monthStr = monthStr;
-    d.monthYear = d.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   });
 
-  // Get sorted unique months
-  monthOptions = Array.from(new Set(data.map(d => d.monthStr))).sort();
+  allData = data;
+  months  = Array.from(new Set(data.map(d => d.monthStr))).sort();
 
-  // Setup slider
-  const slider = document.getElementById('monthSlider');
-  slider.min = 0;
-  slider.max = monthOptions.length - 1;
-  slider.value = 0;
+  // update scale domain to actual max cumulative
+  scaleRadius.domain([0, d3.max(data, d => d.cumulative)]);
 
-  // Initial draw
-  drawBubbles(monthOptions[+slider.value]);
-
-  // On slider move
-  slider.addEventListener('input', () => {
-    const monthStr = monthOptions[+slider.value];
-    drawBubbles(monthStr);
-  });
-
-  // Play/pause control
-  document.getElementById('playButton').addEventListener('click', () => {
-    isPlaying = !isPlaying;
-
-    if (isPlaying) {
-      document.getElementById('playButton').innerText = '⏸ Pause';
-      playInterval = setInterval(() => {
-        let index = +slider.value;
-        if (index >= monthOptions.length - 1) {
-          clearInterval(playInterval);
-          isPlaying = false;
-          document.getElementById('playButton').innerText = '▶ Play';
-          return;
-        }
-        slider.value = index + 1;
-        drawBubbles(monthOptions[slider.value]);
-      }, 400); // 1 month per second
-    } else {
-      clearInterval(playInterval);
-      document.getElementById('playButton').innerText = '▶ Play';
-    }
-  });
-
-  // Draw function
-  function drawBubbles(selectedMonthStr) {
-    // Convert to Date
-    const [year, month] = selectedMonthStr.split('-').map(Number);
-    const selectedDate = new Date(year, month - 1);
-
-    // Update current date display
-    document.getElementById('currentDate').innerText =
-      selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-    // Clear old bubbles
-    bubbles.forEach(b => map.removeLayer(b));
-    bubbles = [];
-
-    const latestByLocation = {};
-    let total = 0;
-
-    data.forEach(d => {
-      if (d.date <= selectedDate) {
-        const key = `${d.lat},${d.lon}`;
-        if (!latestByLocation[key] || d.date > latestByLocation[key].date) {
-          latestByLocation[key] = d;
-        }
-      }
+  // setup controls
+  const slider = d3.select('#monthSlider')
+    .attr('min', 0)
+    .attr('max', months.length - 1)
+    .on('input', function() {
+      drawBubbles(months[this.value]);
     });
 
-    for (const key in latestByLocation) {
-      const d = latestByLocation[key];
-      total += d.cumulative;
+  d3.select('#playButton').on('click', togglePlay);
 
-      const circle = L.circleMarker([d.lat, d.lon], {
-        radius: scaleRadius(d.cumulative),
-        color: 'red',
-        fillOpacity: 0.6,
-        weight: 1
-      }).bindPopup(`
-        <strong>Location:</strong> [${d.lat.toFixed(2)}, ${d.lon.toFixed(2)}]<br>
-        <strong>Date:</strong> ${d.monthYear}<br>
-        <strong>Cumulative Amount:</strong> $${(d.cumulative / 1e9).toFixed(2)}B
-      `).addTo(map);
-
-      bubbles.push(circle);
-
-
-          if (d.lat === 37.09024 && d.lon === -95.712891) {
-      const popupContent = document.createElement('div');
-      popupContent.innerHTML = `
-        <strong>United States</strong><br>
-        <div id="usa-bar-chart" style="width: 300px; height: 200px;"></div>
-      `;
-
-      const circle = L.circleMarker([d.lat, d.lon], {
-        radius: scaleRadius(d.cumulative),
-        color: 'red',
-        fillOpacity: 0.6,
-        weight: 1
-      }).addTo(map);
-
-      circle.bindPopup(popupContent);
-
-      circle.on('popupopen', () => {
-        drawUSABarChart();
-      });
-
-      bubbles.push(circle);
-      }
-
-    }
-
-    document.getElementById('totalAmount').innerText =
-      `Total: $${(total / 1e9).toFixed(2)}B`;
-  }
+  // initial draw
+  drawBubbles(months[0]);
 });
 
+// --- DRAW BUBBLES FOR A GIVEN MONTH ---
+function drawBubbles(monthStr) {
+  const [y,m] = monthStr.split('-').map(Number);
+  const currentDate = new Date(y, m - 1);
 
+  // update overlay text
+  d3.select('#currentDate')
+    .text(currentDate.toLocaleString('default', { month:'long', year:'numeric' }));
+
+  // filter to latest per location up to this date
+  const latest = {};
+  allData.forEach(d => {
+    if (d.date <= currentDate) {
+      const key = `${d.lat}|${d.lon}`;
+      if (!latest[key] || d.date > latest[key].date) latest[key] = d;
+    }
+  });
+  const bubData = Object.values(latest);
+
+  const total = d3.sum(bubData, d => d.cumulative);
+  d3.select('#totalAmount')
+    .text(`$${(total/1e9).toFixed(2)}B`);
+
+  // JOIN
+  const circles = svg.selectAll('circle.bubble')
+    .data(bubData, d => `${d.lat}|${d.lon}`);
+
+  // EXIT
+  circles.exit().remove();
+
+  // ENTER
+  const enter = circles.enter()
+    .append('circle')
+      .attr('class','bubble')
+      .attr('cx', d => projection([d.lon,d.lat])[0])
+      .attr('cy', d => projection([d.lon,d.lat])[1])
+      .attr('r', 0)
+      .attr('fill','red')
+      .attr('fill-opacity',0.6)
+      .attr('stroke','#900')
+      .on('click', d => {
+        if (d.lat.toFixed(2)==='37.09' && d.lon.toFixed(2)==='-95.71') {
+          drawUSABarChart();
+        }
+      });
+
+  // ENTER + UPDATE
+  enter.merge(circles)
+    .transition()
+    .duration(400)
+      .attr('cx', d => projection([d.lon,d.lat])[0])
+      .attr('cy', d => projection([d.lon,d.lat])[1])
+      .attr('r',  d => scaleRadius(d.cumulative));
+}
+
+// --- PLAY / PAUSE LOGIC ---
+function togglePlay() {
+  const btn = d3.select('#playButton');
+  if (isPlaying) {
+    clearInterval(playInterval);
+    btn.text('▶ Play');
+  } else {
+    let idx = +d3.select('#monthSlider').property('value');
+    playInterval = setInterval(() => {
+      idx = (idx + 1) % months.length;
+      d3.select('#monthSlider').property('value', idx);
+      drawBubbles(months[idx]);
+      if (idx === months.length - 1) togglePlay();
+    }, 800);
+    btn.text('⏸ Pause');
+  }
+  isPlaying = !isPlaying;
+}
+
+// --- USA BAR CHART (reuse your existing D3 code) ---
 function drawUSABarChart() {
+  // clear any existing modal / chart
+  d3.select('#usa-bar-chart').selectAll('*').remove();
 
-  const container = d3.select("#usa-bar-chart");
-
-  container.selectAll("*").remove();
-  d3.csv("src/data/bank_map/monthly_failed_banks.csv").then(data => {
+  d3.csv(usaMonthlyPath).then(data => {
     data.forEach(d => {
-      d.Month = d3.timeParse("%Y-%m")(d.Month);
+      d.Month = d3.timeParse('%Y-%m')(d.Month);
       d.Failed_Bank_Count = +d.Failed_Bank_Count;
     });
 
     const margin = { top: 10, right: 10, bottom: 30, left: 40 };
-    const width = 300 - margin.left - margin.right;
-    const height = 200 - margin.top - margin.bottom;
+    const w = 300 - margin.left - margin.right;
+    const h = 200 - margin.top - margin.bottom;
 
-    const svg = d3.select("#usa-bar-chart")
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    const svg2 = d3.select('#usa-bar-chart')
+      .append('svg')
+      .attr('width',  w + margin.left + margin.right)
+      .attr('height', h + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
 
     const x = d3.scaleTime()
       .domain(d3.extent(data, d => d.Month))
-      .range([0, width]);
+      .range([0, w]);
 
     const y = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.Failed_Bank_Count)])
-      .nice()
-      .range([height, 0]);
+      .domain([0, d3.max(data,d=>d.Failed_Bank_Count)]).nice()
+      .range([h, 0]);
 
-    svg.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x).ticks(5).tickFormat(d3.timeFormat("%b %y")))
-      .selectAll("text")
-      .style("font-size", "10px");
+    svg2.append('g')
+      .attr('transform',`translate(0,${h})`)
+      .call(d3.axisBottom(x).ticks(5).tickFormat(d3.timeFormat('%b %y')))
+      .selectAll('text').style('font-size','10px');
 
-    svg.append("g")
+    svg2.append('g')
       .call(d3.axisLeft(y).ticks(5))
-      .selectAll("text")
-      .style("font-size", "10px");
+      .selectAll('text').style('font-size','10px');
 
-    svg.selectAll("rect")
+    svg2.selectAll('rect')
       .data(data)
-      .enter()
-      .append("rect")
-      .attr("x", d => x(d.Month))
-      .attr("y", d => y(d.Failed_Bank_Count))
-      .attr("width", width / data.length)
-      .attr("height", d => height - y(d.Failed_Bank_Count))
-      .attr("fill", "#ff4d4d");
+      .enter().append('rect')
+        .attr('x', d=>x(d.Month))
+        .attr('y', d=>y(d.Failed_Bank_Count))
+        .attr('width', w/data.length)
+        .attr('height', d=>h-y(d.Failed_Bank_Count))
+        .attr('fill','#ff4d4d');
   });
 }
