@@ -1,4 +1,5 @@
 // Set up the SVG container
+// Last updated: Added total money counter and improved country name handling
 let width, height;
 let svg, projection, path;
 let unemploymentData = {};
