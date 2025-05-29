@@ -174,9 +174,15 @@ function initMap() {
                 return normalizeCountryName(dataName) === storedCountryName;
             });
 
-            if (countryData) {
+            // Check if we have valid data for the current year
+            const hasValidData = countryData && countryData[currentYear] && !isNaN(countryData[currentYear]);
+            
+            if (hasValidData) {
                 const displayName = timelineContainer.node().__displayName;
                 showTimeline(displayName, countryData);
+            } else {
+                // Remove the timeline if no valid data is available
+                timelineContainer.remove();
             }
         }
 
@@ -321,10 +327,10 @@ function showTimeline(countryName, data) {
         .style('position', 'absolute')
         .style('left', '10px')
         .style('bottom', '10px')
-        .style('background', 'rgba(255, 255, 255, 0.9)')
+        .style('background', 'rgba(0, 0, 0, 0.9)')  // Changed to black background
         .style('padding', '10px')
         .style('border-radius', '5px')
-        .style('border', '1px solid #ccc')
+        .style('border', '1px solid #333')  // Darker border
         .style('display', 'block');
 
     // Store both the normalized and display names
@@ -339,12 +345,14 @@ function showTimeline(countryName, data) {
     timelineContainer.append('div')
         .attr('class', 'timeline-title')
         .style('font-weight', 'bold')
+        .style('color', 'white')  // White text
         .text(`${displayName} ${isShowingGDP ? 'GDP Growth' : 'Unemployment'} Rate: ${parseFloat(data[currentYear]).toFixed(1)}%`);
 
-    // Create SVG
+    // Create SVG with black background
     const svg = timelineContainer.append('svg')
         .attr('width', timelineWidth + timelineMargin.left + timelineMargin.right)
-        .attr('height', timelineHeight + timelineMargin.top + timelineMargin.bottom);
+        .attr('height', timelineHeight + timelineMargin.top + timelineMargin.bottom)
+        .style('background', 'black');  // Black background
 
     const g = svg.append('g')
         .attr('transform', `translate(${timelineMargin.left},${timelineMargin.top})`);
@@ -368,13 +376,19 @@ function showTimeline(countryName, data) {
         .range([timelineHeight, 0])
         .nice();
 
-    // Add axes
+    // Add axes with white color
     g.append('g')
         .attr('transform', `translate(0,${timelineHeight})`)
-        .call(d3.axisBottom(x).tickFormat(d3.format('d')));
+        .call(d3.axisBottom(x).tickFormat(d3.format('d')))
+        .style('color', 'white')  // White text and lines
+        .selectAll('line')
+        .style('stroke', 'white');  // White tick lines
 
     g.append('g')
-        .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + '%'));
+        .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + '%'))
+        .style('color', 'white')  // White text and lines
+        .selectAll('line')
+        .style('stroke', 'white');  // White tick lines
 
     // Create line generator
     const line = d3.line()
@@ -386,16 +400,26 @@ function showTimeline(countryName, data) {
     // Create the line path
     const timelineData = years.map(year => [year, parseFloat(data[year])]);
 
-    // Add the line
+    // Add grid lines in white
+    g.append('g')
+        .attr('class', 'grid')
+        .attr('opacity', 0.1)
+        .call(d3.axisLeft(y)
+            .tickSize(-timelineWidth)
+            .tickFormat('')
+        )
+        .style('color', 'white');  // White grid lines
+
+    // Add the line with blue color
     g.append('path')
         .datum(timelineData)
         .attr('class', 'timeline-line')
         .attr('fill', 'none')
-        .attr('stroke', '#4a90e2')
+        .attr('stroke', '#4a90e2')  // Bright blue color
         .attr('stroke-width', 2)
         .attr('d', line);
 
-    // Add points
+    // Add points in blue
     g.selectAll('.timeline-point')
         .data(timelineData)
         .enter()
@@ -404,19 +428,17 @@ function showTimeline(countryName, data) {
         .attr('cx', d => x(d[0]))
         .attr('cy', d => y(d[1]))
         .attr('r', 4)
-        .style('fill', '#4a90e2')
-        .style('cursor', 'pointer');
+        .style('fill', '#4a90e2');  // Blue points
 
-    // Highlight current year point
+    // Highlight current year point in red
     g.append('circle')
         .attr('class', 'current-year-point')
         .attr('cx', x(currentYear))
         .attr('cy', y(parseFloat(data[currentYear])))
         .attr('r', 6)
-        .style('fill', '#ff4b4b')
-        .style('cursor', 'pointer');
+        .style('fill', '#ff4b4b');  // Keep red for current point
 
-    // Add hover effects
+    // Add hover effects with white tooltip
     const tooltip = g.append('g')
         .attr('class', 'timeline-tooltip')
         .style('display', 'none');
@@ -425,11 +447,11 @@ function showTimeline(countryName, data) {
         .attr('class', 'tooltip-bg')
         .attr('rx', 3)
         .attr('ry', 3)
-        .attr('fill', 'rgba(0,0,0,0.7)');
+        .attr('fill', 'rgba(255,255,255,0.9)');  // White background for tooltip
 
     tooltip.append('text')
         .attr('class', 'tooltip-text')
-        .attr('fill', 'white')
+        .attr('fill', 'black')  // Black text for better contrast on white background
         .attr('text-anchor', 'middle')
         .attr('dy', '-0.5em');
 
