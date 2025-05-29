@@ -201,6 +201,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     display: none;
     z-index: 10;
+    color: #111;
 }
 
 /* ======= Pop-up Overlay ======= */
@@ -243,5 +244,36 @@
 .y1-axis text,
 .y2-axis text {
   fill: #fff !important;
+}
+
+/* ======= Main timeseries axes (next to US map) ======= */
+.main-timeseries-x path,
+.main-timeseries-x line,
+.main-timeseries-y1 path,
+.main-timeseries-y1 line,
+.main-timeseries-y2 path,
+.main-timeseries-y2 line {
+  stroke: #fff !important;
+  stroke-width: 2px !important;
+}
+.main-timeseries-x text,
+.main-timeseries-y1 text,
+.main-timeseries-y2 text {
+  fill: #fff !important;
+  font-weight: bold;
+}
+
+/* ======= Popup timeseries axes (state/word cloud popups) ======= */
+.popup-timeseries-x path,
+.popup-timeseries-x line,
+.popup-timeseries-y path,
+.popup-timeseries-y line {
+  stroke: #222 !important;
+  stroke-width: 1.5px !important;
+}
+.popup-timeseries-x text,
+.popup-timeseries-y text {
+  fill: #222 !important;
+  font-style: italic;
 }
 

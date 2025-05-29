@@ -140,14 +140,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Axes
         svg.append("g")
-            .attr("class", "x-axis")
+            .attr("class", "x-axis main-timeseries-x")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x));
         svg.append("g")
-            .attr("class", "y1-axis")
+            .attr("class", "y1-axis main-timeseries-y1")
             .call(d3.axisLeft(y1Scale));
         svg.append("g")
-            .attr("class", "y2-axis")
+            .attr("class", "y2-axis main-timeseries-y2")
             .attr("transform", `translate(${width},0)`)
             .call(d3.axisRight(y2Scale));
 
@@ -429,9 +429,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .domain([0, d3.max(timeSeries, d => d.value)])
             .range([height, 0]);
         svg.append('g')
+            .attr('class', 'popup-timeseries-x')
             .attr('transform', `translate(0,${height})`)
             .call(d3.axisBottom(x).ticks(6));
         svg.append('g')
+            .attr('class', 'popup-timeseries-y')
             .call(d3.axisLeft(y));
         const line = d3.line()
             .x(d => x(d.date))
@@ -443,13 +445,5 @@ document.addEventListener('DOMContentLoaded', function() {
             .attr('stroke', '#007bff')
             .attr('stroke-width', 2)
             .attr('d', line);
-        svg.selectAll('circle')
-            .data(timeSeries)
-            .enter()
-            .append('circle')
-            .attr('cx', d => x(d.date))
-            .attr('cy', d => y(d.value))
-            .attr('r', 2)
-            .attr('fill', '#007bff');
     }
 });

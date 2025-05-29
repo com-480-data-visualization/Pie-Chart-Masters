@@ -80,11 +80,15 @@ function createWordCloud(data, date) {
             size = minSize;
         }
         
+        // Assign a fixed rotation (0 or 90) for each word
+        const rotate = Math.random() < 0.5 ? 0 : 90;
+        
         return {
             text: keyword,
             size: size,
             isCrisisRelated: isCrisisRelated,
-            ratio: ratio
+            ratio: ratio,
+            rotate: rotate
         };
     });
 
@@ -124,7 +128,7 @@ function createWordCloud(data, date) {
             .style('opacity', 0)
             .style('cursor', 'pointer')
             .text(d => d.text)
-            .attr('transform', d => `translate(${d.x},${d.y})`)
+            .attr('transform', d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
             .on('click', function(event, d) {
                 showWordTimeSeries(d.text, globalData);
             });
@@ -142,7 +146,7 @@ function createWordCloud(data, date) {
             .duration(1000)
             .style('font-size', d => `${d.size}px`)
             .style('opacity', 1)
-            .attr('transform', d => `translate(${d.x},${d.y})`);
+            .attr('transform', d => `translate(${d.x},${d.y}) rotate(${d.rotate})`);
 
         // Update tooltips for all elements
         text.selectAll('title')
@@ -154,7 +158,7 @@ function createWordCloud(data, date) {
         .size([width, height])
         .words(words)
         .padding(5)  // Increased padding
-        .rotate(() => 0)
+        .rotate(d => d.rotate)
         .font("Arial")
         .fontSize(d => d.size)
         .on("end", draw);
