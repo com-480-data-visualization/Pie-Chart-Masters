@@ -108,14 +108,34 @@
         
         <div class="section" id="sectionstockmarket">
             <h2>The Stock Market Shock </h2>
-            <div class="double-image-container">
-                <img src="src/Images/stockmarket.png" alt="stock_market" class="double-section-image">
-                <img src="src/Images/barchartloss.png" alt="loss" class="double-section-image">
+            <div id="stock-chart"></div>
+
+            <div id="trade-button" class="trade-button">💰 Trade</div>
+
+            <div id="trade-panel" class="trade-panel">
+              <div><strong>Enter investment amount ($):</strong></div>
+              <input type="number" id="investmentInput" placeholder="1000">
+              
+              <div><strong>Select Index:</strong></div>
+              <select id="indexSelect"></select>
+
+              <button id="calculateTrade">📈 Trade</button>
+              <div id="tradeResult"></div>
+              <button id="closeTrade">❌ Close</button>
             </div>
-            <p>These two visualizations highlight the global financial impact of the 2008 crisis through the lens of market performance and institutional losses. The first one is a <strong>line chart</strong> showing the normalized stock indexes of major economies between 2006 and 2009, revealing the timing and intensity of the global shock. The second one is a <strong>bar chart</strong> showing the total writedowns by financial institutions per country, to better understand where the losses were concentrated.</p>
-            <p>Features : The user will be able to hover over the line chart to compare index values across countries on specific dates. On the bar chart, users will be able to filter or highlight countries to compare levels of exposure. Together, they give a clear picture of both public market reaction and institutional damage.</p>
-            <p>Here we will use <strong>D3</strong> to plot the chart as it can easily handle multiple time series. Data will be loaded from a <strong>CSV</strong> file (Lecture 4), and interactions such as tooltip, highlighting and filters will be implemented using <strong>D3</strong> (Lecture 5).</p>
+
+            <div id="bank-loss-button" class="custom-button top-left">
+                📉 Bank Loss
+            </div>
+
+            <div id="bank-loss-modal" class="modal">
+                <button class="modal-close" onclick="document.getElementById('bank-loss-modal').style.display='none'">✖</button>
+                <h2>Total Bank Losses by Country</h2>
+                <div id="bank-loss-chart" class="modal-content"></div>
+            </div>
         </div>
+        <link rel="stylesheet" href="css/stock_chart.css">
+        <script src="js/stock_chart.js"></script>
         <div class="section" id="section_word_cloud">
             <h2>Public Anxiety: Tracking Fear Through Search Trends</h2>
             
