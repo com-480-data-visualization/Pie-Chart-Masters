@@ -1,3 +1,5 @@
+(function(){
+
 // bank_map_static.js
 
 // --- CONFIGURATION & GLOBALS ---
@@ -212,3 +214,4 @@ function drawUSABarChart() {
         .attr('fill','#ff4d4d');
   });
 }
+})();
