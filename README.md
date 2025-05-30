@@ -131,6 +131,8 @@ We also looked at projects from students in previous years, and the project on F
 
 ## Milestone 3 (30th May, 5pm)
 
+### OUR WEBSITE CAN DIRECTLY BE ACCESSED THROUGH THE GITHUB REPOSITORY PAGE OR AT THE FOLLOWING LINK : 
+
 **80% of the final grade**
 
 
