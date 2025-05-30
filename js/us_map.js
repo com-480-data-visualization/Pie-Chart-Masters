@@ -12,6 +12,7 @@ let mapData = null;
 let timeseriesData = null;
 
 document.addEventListener('DOMContentLoaded', function() {
+
     const container = d3.select('#mortgage-map-container');
     // Responsive sizing
     function getMapSize() {

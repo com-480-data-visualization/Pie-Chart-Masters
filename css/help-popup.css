@@ -1,0 +1,80 @@
+.help-title-tooltip {
+    position: absolute;
+    left: 50%;
+    top: 120%;
+    transform: translateX(-50%);
+    background: #4885ef;
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.65em;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    z-index: 20001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s;
+    bottom: auto;
+}
+
+.help-popup-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10000;
+}
+
+.help-popup-content {
+    background: #fff;
+    padding: 24px 28px 20px 28px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    min-width: 320px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: auto;
+    position: relative;
+    color: #222;
+    font-size: 1.05em;
+    text-align: left;
+    font-family: inherit;
+}
+
+.help-popup-close {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none; border: none;
+    font-size: 24px; cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+}
+.help-popup-close:hover {
+    color: #e41a1c;
+}
+
+.help-helpicon-container {
+    display: inline-block;
+    position: relative;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+.help-icon {
+    font-size: 1.1em;
+    color: #007bff;
+    cursor: pointer;
+    transition: color 0.2s;
+    vertical-align: middle;
+}
+.help-icon:hover {
+    color: #007bff;
+}
+.help-helpicon-container .help-title-tooltip {
+    opacity: 0;
+    pointer-events: none;
+}
+.help-icon:hover + .help-title-tooltip,
+.help-icon:focus + .help-title-tooltip {
+    opacity: 1;
+    pointer-events: auto;
+}

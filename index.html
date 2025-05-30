@@ -14,6 +14,7 @@
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <!-- Custom styles for unemployment map -->
     <link rel="stylesheet" href="css/unemployment-map.css">
+    <link rel="stylesheet" href="css/help-popup.css">
 </head>
 <body>
     <div class="container">
@@ -21,12 +22,18 @@
             <div id="stochastic-animation" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none;"></div>
             <div class="welcome-content" style="position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; text-align: center;">
                 <h1 style="font-size: 4vw; font-weight: bold; margin-bottom: 2vh;">What happened in 2008?</h1>
-                <p style="font-size: 2vw;">Scroll down to dive into the data and understand the impact of the financial crisis on the world</p>
+                <p style="font-size: 2vw; width: 80vw;">Scroll down to dive into the data and understand the impact of the financial crisis on the world</p>
             </div>
         </div>
         <div class="section" id="section2">
             <div class="mortgage-grid">
-                <h2 class="mortgage-title">US Mortgage Delinquency Rate by State (90+ days)</h2>
+                <h2 class="mortgage-title">
+                    US Mortgage Delinquency Rate by State (90+ days)
+                    <span class="help-helpicon-container" data-help="sectionmortgage">
+                      <i class="fa-solid fa-circle-question help-icon"></i>
+                      <span class="help-title-tooltip">Plus d'infos ?</span>
+                    </span>
+                </h2>
                 <div class="mortgage-map-area">
                     <div id="mortgage-map-container"></div>
                     <div id="mortgage-map-legend-container"></div>
@@ -63,13 +70,19 @@
         </div>
         
         <div class="section" id="section3">
-            <h2>Global Unemployment Impact</h2>
+            <h2 class="globalunemployement-title">
+                Golbal Unemployment Impact
+                <span class="help-helpicon-container" data-help="sectionglobalunemployement">
+                  <i class="fa-solid fa-circle-question help-icon"></i>
+                  <span class="help-title-tooltip">Plus d'infos ?</span>
+                </span>
+            </h2>
             <div id="unemployment-map-container">
                 <div id="unemployment-tooltip"></div>
                 <div class="unemployment-legend">
                     <div class="unemployment-legend-title">Unemployment Rate (%)</div>
                     <div class="unemployment-legend-scale"></div>
-                    <div class="unemployment-legend-labels">
+                    <div class="uneomployment-legend-labels">
                         <span>0%</span>
                         <span>7.5%</span>
                         <span>15%+</span>
@@ -90,23 +103,14 @@
             </div>
         </div>
         
-        <div class="section" id="bank-failures-map">
-            <h2>Global Bank Failures Map</h2>
-            <div id="map-container">
-                <div id="bankMap"></div>
-                <div id="bank-controls">
-                    <button id="playButton">▶ Play</button>
-                    <div id="currentDate">—</div>
-                    <div id="totalAmount">—</div>
-                    <input type="range" id="monthSlider" min="0" max="0" step="1">
-                </div>
-            </div>
-            <link rel="stylesheet" href="css/bank_map.css">
-            <script src="js/bank_map.js"></script>
-        </div>
-        
         <div class="section" id="sectionstockmarket">
-            <h2>The Stock Market Shock </h2>
+            <h2 class="stockmarket-title">
+                The Stock Market Shock
+                <span class="help-helpicon-container" data-help="sectionstockmarket">
+                  <i class="fa-solid fa-circle-question help-icon"></i>
+                  <span class="help-title-tooltip">Plus d'infos ?</span>
+                </span>
+            </h2>
             <div id="stock-chart"></div>
 
             <div id="trade-button" class="trade-button">💰 Trade</div>
@@ -136,8 +140,13 @@
         <link rel="stylesheet" href="css/stock_chart.css">
         <script src="js/stock_chart.js"></script>
         <div class="section" id="section_word_cloud">
-            <h2>Public Anxiety: Tracking Fear Through Search Trends</h2>
-            
+            <h2 class="wordcloud-title">
+                Public Anxiety: Tracking Fear Through Search Trends
+                <span class="help-helpicon-container" data-help="sectionwordcloud">
+                  <i class="fa-solid fa-circle-question help-icon"></i>
+                  <span class="help-title-tooltip">Plus d'infos ?</span>
+                </span>
+            </h2>
             <!-- Container for the word cloud -->
             <div id="word-cloud-container" class="word-cloud"></div>
             
@@ -183,7 +192,6 @@
         <div class="nav-dot" data-section="2"></div>
         <div class="nav-dot" data-section="3"></div>
         <div class="nav-dot" data-section="4"></div>
-        <div class="nav-dot" data-section="5"></div>
     </div>
 
     <!-- Load D3.js first -->
@@ -194,5 +202,6 @@
     <script src="js/welcome_stochastic.js"></script>
     <!-- Custom script for unemployment map -->
     <script src="js/unemployment-map.js"></script>
+    <script src="js/help-popup.js"></script>
 </body>
 </html>

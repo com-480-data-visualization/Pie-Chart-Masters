@@ -9,7 +9,6 @@ function initializeWordCloud() {
     // Load and process the data
     d3.json('src/data/google_trends/weekly_google_trends.json')
         .then(data => {
-            console.log('Data loaded:', data);
             // Store data globally
             globalData = data;
             // Create slider with dates and pass the data
@@ -162,16 +161,14 @@ function createWordCloud(data, date) {
         .font("Arial")
         .fontSize(d => d.size)
         .on("end", draw);
-
-    // Debug log before starting layout
-    console.log('Starting layout with words:', words);
     
     layout.start();
 }
 
 // Function to create the slider and play controls
 function createSlider(dates, data) {
-    // Create slider
+    // Utilise le slider déjà présent dans le HTML
+
     const slider = d3.select('#wc-slider-container .wc-slider')
         .attr('min', 0)
         .attr('max', dates.length - 1)
@@ -183,9 +180,9 @@ function createSlider(dates, data) {
     // Format date function
     const formatDate = (dateStr) => {
         const months = {
-            '01': 'Jan', '02': 'Fév', '03': 'Mar', '04': 'Avr',
-            '05': 'Mai', '06': 'Juin', '07': 'Juil', '08': 'Août',
-            '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Déc'
+            '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+            '05': 'Mai', '06': 'June', '07': 'July', '08': 'August',
+            '09': 'September', '10': 'October', '11': 'November', '12': 'December'
         };
         const month = months[dateStr.substring(5, 7)];
         const year = dateStr.substring(0, 4);
@@ -328,7 +325,6 @@ function showWordTimeSeries(word, data) {
     let width = chartContainer.node().getBoundingClientRect().width - margin.left - margin.right;
     if (width <= 0 || isNaN(width)) width = 600; // fallback width for popup
     const height = 300 - margin.top - margin.bottom;
-    console.log('SVG width:', width, 'height:', height);
 
     const svg = chartContainer.append('svg')
         .attr('width', width + margin.left + margin.right)
