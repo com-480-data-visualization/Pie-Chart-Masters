@@ -132,7 +132,7 @@ We also looked at projects from students in previous years, and the project on F
 ## Milestone 3 (30th May, 5pm)
 
 ### OUR WEBSITE CAN DIRECTLY BE ACCESSED THROUGH THE GITHUB REPOSITORY PAGE OR AT THE FOLLOWING LINK : **[FINAL WEBSITE LINK](https://com-480-data-visualization.github.io/Pie-Chart-Masters/)**  
-#### The User can navigate through the different sections of the website by scrolling vertically, either using his mouse or arrows. For each visualization, the user can begin by playing with the interactive visuals before clicking on a (?) button "Additional Insights" that will open an explanatory page that explain the goal of the visualization, how to use it and the key takeaways. 
+#### The User can navigate through the different sections of the website by scrolling vertically, either using his mouse or arrows. For each visualization, the user can begin by playing with the interactive visuals before clicking on a (?) button "Additional Insights" that will open an explanatory page that explains the goal of the visualization, how to use it and the key takeaways. 
 
 
 **80% of the final grade**
