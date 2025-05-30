@@ -53,19 +53,19 @@ const helpTexts = {
         <ul>
             <li style="margin-left: 1.5em;">
                 <b>What is this map showing?</b><br>
-                <!-- Brief explanation of the two indicators and the color gradient -->
+                 This visualization displays global unemployment rates and GDP growth during the 2008 Financial Crisis period (2000-2023). Users can toggle between these two economic indicators to see how different countries were affected over time.
             </li>
             <li>
                 <b>What do you see?</b>
                 <ul style="margin-left: 1.5em;">
                     <li>
-                        <b>Regional unemployment trends:</b> <!-- Placeholder -->
+                        <b>Regional unemployment trends:</b> Regional unemployment trends: Southern European countries like Spain and Greece were hit hardest with over 20% unemployment, while North America experienced a shorter recovery period. Asian economies maintained relative stability, though Mediterranean countries continued to struggle with persistent unemployment long after the crisis.
                     </li>
                     <li>
-                        <b>GDP growth patterns:</b> <!-- Placeholder -->
+                        <b>GDP growth patterns:</b> GDP growth patterns: Advanced economies experienced severe contractions in 2008-2009, while emerging markets maintained positive growth despite slowdown. The Eurozone faced a unique challenge with a double-dip recession, showing how regional economic ties could amplify crisis effects.
                     </li>
                     <li>
-                        <b>Emerging vs. developed economies:</b> <!-- Placeholder -->
+                        <b>Emerging vs. developed economies:</b> Emerging vs. developed economies: The crisis revealed a clear divide in economic resilience, with emerging markets recovering faster than developed nations. This period accelerated the shift of economic power from West to East, demonstrating the growing importance of emerging economies in the global financial system.
                     </li>
                 </ul>
             </li>
@@ -97,7 +97,7 @@ const helpTexts = {
             </li>
         </ul>
         <p>
-            <b>Key takeaway:</b> <!-- Placeholder for summary of insights -->
+            <b>Key takeaway:</b> The visualization powerfully demonstrates how the 2008 Financial Crisis, originating from the US housing market, created a ripple effect across the global economy. While Western economies struggled with high unemployment and GDP contractions, emerging markets showed surprising resilience. The interactive map, highlighting nearly $1 trillion in bank failures, reveals how deeply interconnected the global financial system had become, ultimately leading to a significant shift in economic power from West to East.
         </p>
 
     `,

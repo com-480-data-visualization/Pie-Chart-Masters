@@ -492,6 +492,12 @@ function updateMap(year) {
     document.getElementById('unemployment-year-display').textContent = formatYearDisplay(year);
     document.getElementById('unemployment-year-slider').value = Math.floor(year);
 
+    // Update legend title based on data type
+    const legendTitle = document.querySelector('.unemployment-legend-title');
+    if (legendTitle) {
+        legendTitle.textContent = isShowingGDP ? 'GDP Growth Rate (%)' : 'Unemployment Rate (%)';
+    }
+
     // Update total money counter in crisis mode
     if (isInCrisisMode && !isTransitioning) {
         const currentDate = new Date(crisisStartDate.getTime() + ((year - 2007) * 12) * (30.44 * 24 * 60 * 60 * 1000));
