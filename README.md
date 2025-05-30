@@ -129,8 +129,14 @@ We also looked at projects from students in previous years, and the project on F
 
 ### See https://com-480-data-visualization.github.io/Pie-Chart-Masters/ for the skeleton of the website and the pdf milestone_2_report.pdf for the report.
 
+----------------------------------------------------------------------------------------------------------
+
 ## Milestone 3 (30th May, 5pm)
 
+### OUR WEBSITE CAN DIRECTLY BE ACCESSED THROUGH THE GITHUB REPOSITORY PAGE OR AT THE FOLLOWING LINK : **[FINAL WEBSITE LINK](https://com-480-data-visualization.github.io/Pie-Chart-Masters/)**  
+#### The User can navigate through the different sections of the website by scrolling vertically, either using his mouse or arrows. For each visualization, the user can begin by playing with the interactive visuals before clicking on a (?) button "Additional Insights" that will open an explanatory page that explains the goal of the visualization, how to use it and the key takeaways. 
+
+#### The **Process Book** can be found on the repository "Process Book - PieChartMasters.pdf" as well as the **screencast video**" called "Final Video - PieChartMasters - Data Visualization.mp4"
 **80% of the final grade**
 
 
