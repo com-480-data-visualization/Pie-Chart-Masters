@@ -1,0 +1,12 @@
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# Large media files
+*.mp4
+*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class 
