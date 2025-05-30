@@ -129,6 +129,8 @@ We also looked at projects from students in previous years, and the project on F
 
 ### See https://com-480-data-visualization.github.io/Pie-Chart-Masters/ for the skeleton of the website and the pdf milestone_2_report.pdf for the report.
 
+----------------------------------------------------------------------------------------------------------
+
 ## Milestone 3 (30th May, 5pm)
 
 ### OUR WEBSITE CAN DIRECTLY BE ACCESSED THROUGH THE GITHUB REPOSITORY PAGE OR AT THE FOLLOWING LINK : **[FINAL WEBSITE LINK](https://com-480-data-visualization.github.io/Pie-Chart-Masters/)**  
