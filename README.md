@@ -131,7 +131,7 @@ We also looked at projects from students in previous years, and the project on F
 
 ## Milestone 3 (30th May, 5pm)
 
-### OUR WEBSITE CAN DIRECTLY BE ACCESSED THROUGH THE GITHUB REPOSITORY PAGE OR AT THE FOLLOWING LINK : **[FINAL WEBSITE LINK]([https://en.wikipedia.org/wiki/List_of_banks_acquired_or_bankrupted_during_the_Great_Recession](https://com-480-data-visualization.github.io/Pie-Chart-Masters/))**  
+### OUR WEBSITE CAN DIRECTLY BE ACCESSED THROUGH THE GITHUB REPOSITORY PAGE OR AT THE FOLLOWING LINK : **[FINAL WEBSITE LINK](https://com-480-data-visualization.github.io/Pie-Chart-Masters/)**  
 
 
 **80% of the final grade**
